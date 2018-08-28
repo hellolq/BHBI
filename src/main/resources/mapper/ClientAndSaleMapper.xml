@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bbg.mapper.ClientAndSaleMapper">
+
+    <select id="selectSaleAndClient"  resultType="com.bbg.pojo.SaleAndClient" parameterType="com.bbg.pojo.SaleAndClientRequireParam">
+
+
+            SELECT b.shopid as shopId,b.shopname as shopName,b.bj_yt as yt,b.sq as sq,sum(xsje) as xsje,sum(hyxs) as hyxs,
+            sum(kll) as kll,sum(xsbs) as xsbs,to_char(rq,'${timeType}') as zfrq ,
+            ROUND(decode(sum(xsje_kb),0,0,(sum(xsje)-sum(xsje_kb))/ sum(xsje_kb) *100 ),2) || '%'  as xsjekbRate ,
+            ROUND(decode(sum(xsje),0,0,sum(xsml)/ sum(xsje) *100 ),2) || '%'  as mll
+
+        <if test="timeType == 'yyyy-mm' or timeType == 'yyyy-q' ">
+            , ROUND(decode(sum(xsjh),0,0,sum(xsje)/ sum(xsjh) *100 ),2) || '%' as dcRate
+        </if>
+
+        FROM  ZH_MD_TBZS a,lp_bi_shop b WHERE a.shopid = b.shopid
+
+        <if test=" shopId != '' and shopId != null " >
+            and b.shopId in (${shopId})
+        </if>
+
+        <if test=" startTime != '' and startTime != null " >
+            and rq between  to_date(#{startTime},'yyyymmdd') and to_date(#{endTime},'yyyymmdd')
+        </if>
+        group by to_char(rq,'${timeType}'),b.shopid ,b.shopname,b.bj_yt,b.sq
+        order by zfrq ,xsje desc
+    </select>
+
+    <!--<select id="selectSaleAndClient"  resultType="com.bbg.pojo.SaleAndClient" parameterType="com.bbg.pojo.SaleAndClientRequireParam">
+       SELECT b.shopid as shopId,b.shopname as shopName,b.bj_yt as yt,b.sq as sq,sum(xsje) as xsje,sum(hyxs) as hyxs,
+       sum(kll) as kll,sum(xsbs) as xsbs,to_char(rq,'${timeType}') as zfrq
+
+        FROM  ZH_MD_TBZS a,lp_bi_shop b WHERE a.shopid = b.shopid
+
+        <if test=" shopId != '' and shopId != null " >
+            and b.shopId in (${shopId})
+        </if>
+
+        <if test=" startTime != '' and startTime != null " >
+            and rq between  to_date(#{startTime},'yyyymmdd') and to_date(#{endTime},'yyyymmdd')
+        </if>
+          group by to_char(rq,'${timeType}'),b.shopid ,b.shopname,b.bj_yt,b.sq
+            order by zfrq ,xsje desc
+    </select>-->
+
+
+    <select id="selectSaleAndClientParse"  resultType="com.bbg.pojo.SaleAndClient" parameterType="com.bbg.pojo.SaleAndClientRequireParam">
+        select sum(xsje) as xsje,sum(hyxs) as hyxs,sum(kll) as kll,sum(xsbs) as xsbs,to_char(rq,'${timeType}') as zfrq  from ZH_MD_TBZS where 1=1
+
+        <if test=" shopId != '' and shopId != null " >
+            and shopId in (${shopId})
+        </if>
+
+        <if test=" startTime != '' and startTime != null " >
+            and rq between  to_date(#{startTime},'yyyymmdd') and to_date(#{endTime},'yyyymmdd')
+        </if>
+        group by to_char(rq,'${timeType}') order by to_char(rq,'${timeType}'),xsje
+    </select>
+
+
+  <select id="selectSqList" resultType="String">
+     select distinct sq  from lp_bi_shop
+  </select>
+
+    <select id="selectAllShop" resultType="com.bbg.pojo.ShopInfo">
+        select shopid as shopId,shopname as shopName,sq,bj_yt as bjYt from lp_bi_shop
+    </select>
+
+</mapper>

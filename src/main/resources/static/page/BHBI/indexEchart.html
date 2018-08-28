@@ -1,0 +1,461 @@
+<!DOCTYPE html >
+<html xmlns:th="http://www.thymeleaf.org">
+
+	<head>
+		<meta charset="utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta name="renderer" content="webkit">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<title></title>
+		<link href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
+		<link th:href="@{/page/BHBI/css/index.css}" rel="stylesheet">
+		<link rel="stylesheet" th:href="@{/page/BHBI/css/bootstrap-datetimepicker.min.css}" />
+	</head>
+	<style>
+		.sx_tj_row {
+			height: 56px;
+		}
+		
+		.select_btn {
+			text-align: right;
+		}
+
+		b{
+			font-weight: normal;
+		}
+
+		.btn-default{
+			margin: 5px;
+		}
+		.form_datetime{
+			padding-left: 8px;
+		}
+		button.btn.btn-default.active {
+			background-color: #3879D9;
+			color: white;
+		}
+
+
+		.bbgMui-loading-mask {
+			position: fixed;
+			top: 0;
+			left: 0;
+			right: 0;
+			bottom: 0;
+			background-color: #000;
+			height: 100%;
+			opacity: 0.5;
+			filter: alpha(opacity =     50);
+		}
+
+		.bbgMui-loading-load {
+			position: fixed;
+			top: 50%;
+			left: 50%;
+			margin: -25px 0 0 -25px;
+			color: #fff;
+			font-family: '微软雅黑';
+		}
+
+		.bbgMui-loading-circle {
+			width: 42px;
+			height: 42px;
+			margin: 10px auto;
+			padding: 5px;
+			position: relative;
+			border-radius: 100px;
+			-webkit-border-radius: 100px;
+			-moz-border-radius: 100px;
+			background: #fff url(/page/BHBI/images/loaderc.gif) no-repeat center center;
+		}
+	</style>
+
+	<body>
+
+	<div id="zzc" class="bbgMui-loading-mask"
+		 style="z-index: 55555; display: none;">
+		<div class="bbgMui-loading-load">
+			<div class="bbgMui-loading-circle"></div>
+			Loading...
+		</div>
+	</div>
+
+		<!-- 搭建显示页面 -->
+		<div class="container" id="container">
+			<!-- 标题 -->
+			<div class="row">
+				<div class="col-md-12">
+					<h1>客流销售趋势分析</h1>
+				</div>
+			</div>
+
+			<!--
+            	作者：liqiaoyes@qq.com
+            	时间：2018-08-24
+            	描述：条件筛选
+            -->
+
+			<article class="sx_tj">
+
+				<div class="row sx_tj_row">
+					<div class="col-xs-1 sx_tj_sq_head">全司</div>
+					<div class="col-xs-11 sx_tj_sq_body">
+						<button  class="btn btn-default shop_all active shop_list" >全司</button>
+					</div>
+				</div>
+
+				<div class="row sx_tj_row">
+					<div class="col-xs-1 sx_tj_sq_head">省区</div>
+					<div class="col-xs-11 sx_tj_sq_body  " id="shop_sq">
+						<button th:each="temp,tempSta:${sqList}" class="btn btn-default shop_sq shop_list" th:text="${temp}" ></button>
+					</div>
+				</div>
+				<div class="row sx_tj_row">
+					<div class="col-xs-1 sx_tj_sq_head">业态</div>
+					<div class="col-xs-11 sx_tj_sq_body" id="shop_yt">
+						<button class="btn btn-default shop_list" type="submit">广场</button>
+						<button class="btn btn-default shop_list" type="submit">百货</button>
+						<button class="btn btn-default shop_list" type="submit">生活广场</button>
+					</div>
+				</div>
+
+				<div class="row sx_tj_row">
+					<div class="col-xs-1 sx_tj_sq_head">时段</div>
+					<div class="col-xs-4">
+						<input id="startTime" size="16" type="text"   class="form_datetime">
+					</div>
+					<div class="col-xs-2" style="line-height: 26px;">至</div>
+					<div class="col-xs-4 ">
+						<input id="endTime" size="16" type="text"   class="form_datetime">
+					</div>
+				</div>
+
+
+
+				<div class="row sx_tj_row">
+					<div class="col-xs-1 sx_tj_sq_head">对比时段</div>
+					<div class="col-xs-4">
+						<input id="startTimedb" size="16" type="text"   class="form_datetime">
+					</div>
+					<div class="col-xs-2" style="line-height: 26px;">至</div>
+					<div class="col-xs-4 ">
+						<input id="endTimedb" size="16" type="text"   class="form_datetime">
+					</div>
+				</div>
+
+				<div class="row sx_tj_row">
+					<div class="col-xs-1 sx_tj_sq_head">周期</div>
+					<div class="col-xs-11 sx_tj_sq_body" id="shop_zq">
+						<button class="btn btn-default shop_list_zq active" type="submit" data="yyyy-mm-dd">日</button>
+						<button class="btn btn-default shop_list_zq " type="submit" data="yyyy-WW">周</button>
+						<button class="btn btn-default shop_list_zq " type="submit" data="yyyy-mm">月</button>
+						<button class="btn btn-default shop_list_zq " type="submit" data="yyyy-q">季</button>
+					</div>
+				</div>
+
+				<div class="row sx_tj_row">
+					<div class="col-xs-1 sx_tj_sq_head">门店</div>
+					<div class="col-xs-11 sx_tj_sq_body" id="show_shop_div">
+						<button th:each="temp,tempSta:${page_shops}" class="btn btn-default shop_item" type="submit"
+								 th:shopId="${temp.shopId}" th:text="${temp.shopName}"></button>
+					</div>
+				</div>
+
+
+				
+
+				
+				
+
+				
+				<div class="row select_btn">
+					<button type="button" class="btn btn-info" id="select_btn">查询</button>
+					<button type="button" class="btn btn-primary" id="export_echart">表单数据</button>
+				</div>
+
+			</article>
+
+			<!-- 显示图表数据 -->
+			<article>
+               <label>客流趋势分析图</label>
+				<div id="kll_echart" style="height: 560px;"></div>
+			</article>
+		</div>
+
+	</body>
+	<script src="https://cdn.bootcss.com/jquery/1.12.4/jquery.min.js"></script>
+	<script src="https://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+	<script type="text/javascript" th:src="@{/page/BHBI/js/bootstrap-datetimepicker.min.js}"></script>
+	<script type="text/javascript" th:src="@{/page/BHBI/js/bootstrap-datetimepicker.zh-CN.js}" ></script>
+	<script type="text/javascript" th:src="@{/page/BHBI/js/echarts.min.js}" ></script>
+	<script type="text/javascript" th:src="@{/page/BHBI/js/macarons.js}" ></script>
+
+	<script th:inline="javascript">
+        var page_shops = [[${page_shops}]];
+        var now_time = new Date();
+        var his_auth_shopId="";
+        var his_auth_startTime="";
+        var his_auth_endTime="";
+
+        function  getNewPage(shopId,startTime,endTime,startTimedb,endTimedb,timeType) {
+            ajaxSelectSaleAndClientParse(shopId,startTime,endTime,startTimedb,endTimedb,timeType).done(function(obj){
+                klqsfx(obj.time,obj.xsje,obj.hyxs,obj.xsbs,obj.kll,obj.timedb,obj.xsjedb,obj.hyxsdb,obj.xsbsdb,obj.klldb);
+                $("#zzc").hide();
+            });
+        }
+        function ajaxSelectSaleAndClientParse(shopId,startTime,endTime,startTimedb,endTimedb,timeType){
+            $("#zzc").show();
+            var deferred = $.Deferred();
+            $.ajax({
+                url:"/ajaxSelectSaleAndClientParse",
+                type:"post",
+                data:{"shopId":shopId,"startTime":startTime,"endTime":endTime,"startTimedb":startTimedb,"endTimedb":endTimedb,"timeType":timeType},
+                dataType:"json",
+                success:function(data){
+                    if(data.status == "200"){
+                        his_auth_shopId=shopId;
+                        his_auth_startTime=startTime;
+                        his_auth_endTime=endTime;
+                        deferred.resolve(data.obj);
+                    }
+                }
+            });
+            return deferred.promise();
+        }
+        function  klqsfx(time,xsje,hyxs,xsbs,kll,timedb,xsjedb,hyxsdb,xsbsdb,klldb) {
+            var myChart = echarts.init(document.getElementById("kll_echart"),theme);
+            option = {
+                tooltip: {
+                    trigger: 'axis',
+
+                    formatter: function (params) {
+                        var result = '';
+                        $.each(params,function(index,value){
+                            result +=  "<span style='display:inline-block;margin-right:5px;border-redius:10px;width:9px;height:9px;background-color:"+value.color+";'></span>"+  value.seriesName + ":" + value.data+"<br/> ";
+                        })
+                        return result;
+                    }
+
+                },
+                legend: {
+                    data:['销售-本期', '销售-对比','会员销售-本期', '会员销售-对比','客流-本期', '客流-对比','交易笔数-本期', '交易笔数-对比'],
+                    selected:{
+                        '销售-对比' : false,
+                        '会员销售-对比' : false,
+                        '客流-对比' : false,
+                        '交易笔数-对比' : false
+					}
+                },
+                grid: {
+                    top: 70,
+                    bottom: 100
+                },
+                dataZoom: [
+                    {
+                        type: 'inside'
+                    }
+                ],
+                xAxis: [
+                    {
+                        type: 'category',
+                        data: time,
+                        axisLabel: {
+                            interval:0,
+                            rotate:300
+                        },
+
+                    },{
+                        type: 'category',
+                        data: timedb,
+                        axisLabel: {
+                            interval:0,
+                            rotate:300
+                        },
+
+						show:false
+                    }
+
+                ],
+                yAxis: [
+                    {
+                        type: 'value',
+                        show : false
+                    },{
+                        type: 'value',
+                        show : false
+                    },{
+                        type: 'value',
+                        show : false
+                    },{
+                        type: 'value',
+                        show : false
+                    }
+                ],
+                series: [
+                    {
+                        name:'销售-本期',
+                        type:'bar',
+						smooth: true,
+                        data: xsje
+                    },
+                    {
+                        name:'会员销售-本期',
+                        type:'bar',
+                        yAxisIndex: 1,
+                        smooth: true,
+                        data: hyxs
+                    },{
+                        name:'交易笔数-本期',
+                        type:'line',
+                        yAxisIndex: 2,
+                        smooth: true,
+                        data: xsbs
+                    },{
+                        name:'客流-本期',
+                        type:'line',
+                        yAxisIndex: 3,
+                        smooth: true,
+                        data: kll
+                    },{
+                        name:'销售-对比',
+                        type:'bar',
+                        smooth: true,
+                        data: xsjedb
+                    },
+                    {
+                        name:'会员销售-对比',
+                        type:'bar',
+                        yAxisIndex: 1,
+                        smooth: true,
+                        data: hyxsdb
+                    },{
+                        name:'交易笔数-对比',
+                        type:'line',
+                        yAxisIndex: 2,
+                        smooth: true,
+                        data: xsbsdb
+                    },{
+                        name:'客流-对比',
+                        type:'line',
+                        yAxisIndex: 3,
+                        smooth: true,
+                        data: klldb
+                    }
+                ]
+            };
+            myChart.setOption(option,true);
+            var zoomSize = 6;
+            myChart.on('click', function(params) {
+                myChart.dispatchAction({
+                    type : 'dataZoom',
+                    startValue : x1HY[Math.max(params.dataIndex - zoomSize / 2,
+                        0)],
+                    endValue : x1HY[Math.min(params.dataIndex + zoomSize / 2,
+                        hyxs.length - 1)]
+                });
+            });
+
+        }
+
+
+        function showShop() {
+            var sq_item = "";
+            var yt_item = "";
+            var show_shops = new Array();
+
+			//判断省区是否选中
+            $("#shop_sq button.active").each(function(){
+                sq_item = sq_item +","+ $(this).text();
+			});
+
+			//判断业态是否选中
+            $("#shop_yt button.active").each(function(){
+                yt_item = yt_item +","+ $(this).text();
+            });
+
+            $.each(page_shops,function(index,value){
+                if((sq_item == "" || sq_item.indexOf(value.sq) > -1 ) && (yt_item == "" ||  yt_item.indexOf(','+value.bjYt) > -1)){
+                    show_shops.push(value);
+                }
+            });
+
+
+
+            $("#show_shop_div").empty();
+			for(var i=0;i<show_shops.length;i++){
+			    var btn_temp = "<button class='btn btn-default shop_item' type='submit' " +
+					"                     shopid='"+show_shops[i].shopId+"'>"+show_shops[i].shopName+"</button>";
+                $("#show_shop_div").append(btn_temp);
+			}
+        }
+
+        function p(s) {
+            return s < 10 ? '0' + s : s;
+        }
+
+        function formatDate(myDate) {
+            var year = myDate.getFullYear();
+            var month = myDate.getMonth() + 1;
+            var date = myDate.getDate();
+            return year + '' + p(month) + "" + p(date);
+        }
+
+
+		 $(function(){
+		     $("#startTime").val(formatDate(now_time).substr(0,6)+'01');
+             $("#endTime").val(formatDate(now_time));
+             $("#startTimedb").val(formatDate(new Date(now_time  - 364 * 24 * 3600 * 1000)).substr(0,6)+'01');
+             $("#endTimedb").val(formatDate(new Date(now_time - 365 * 24 * 3600 * 1000)));
+             getNewPage('',$("#startTime").val(),$("#endTime").val(),$("#startTimedb").val(),$("#endTimedb").val(),$($(".shop_list_zq.active")[0]).attr("data"));
+             $("#show_shop_div").on('click','.shop_item',function () {
+                 var className = $(this).attr("class");
+                 if(className.indexOf("active") > 0){
+                     $(this).removeClass("active");
+                 }else{
+                     $(this).addClass("active");
+                 }
+             });
+
+             $("#shop_zq button").on('click',function () {
+                 $(".shop_list_zq").removeClass("active");
+                 $(this).addClass("active");
+             });
+
+             $("#container").on('click','.shop_list',function () {
+				 var className = $(this).attr("class");
+				 if(className.indexOf("active") > 0){
+				     $(this).removeClass("active");
+				 }else{
+                     $(this).addClass("active");
+				 }
+                 showShop();
+             });
+
+             $("#select_btn").on('click',function () {
+                 var shopId = "";
+                 var shop_num_active = $("#show_shop_div button.active").length;
+                 var shop_num = $("#show_shop_div button").length;
+                 if(shop_num == 0){
+                     alert("请选择要查询的门店");
+                     return;
+				 }
+                 if(shop_num_active > 0){
+                     $("#show_shop_div button.active").each(function(){
+                         shopId = shopId+","+$(this).attr("shopId");
+                     });
+				 }else{
+                     $("#show_shop_div button").each(function(){
+                         shopId = shopId+","+$(this).attr("shopId");
+                     });
+				 }
+                 getNewPage(shopId.substr(1),$("#startTime").val(),$("#endTime").val(),$("#startTimedb").val(),$("#endTimedb").val(),$($(".shop_list_zq.active")[0]).attr("data"));
+             });
+
+             $("#export_echart").on('click',function () {
+                 window.location.href="/selectSaleAndClient";
+             });
+
+		 });
+	</script>
+
+</html>
