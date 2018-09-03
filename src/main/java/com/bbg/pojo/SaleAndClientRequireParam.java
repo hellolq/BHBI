@@ -13,6 +13,15 @@ public class SaleAndClientRequireParam {
     private String timeType;
     private int pnSize;
     private int pn;
+    private String dbType;
+
+    public String getDbType() {
+        return dbType;
+    }
+
+    public void setDbType(String dbType) {
+        this.dbType = dbType;
+    }
 
     public String getTimeType() {
         return timeType;

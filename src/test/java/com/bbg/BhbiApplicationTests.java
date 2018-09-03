@@ -1,6 +1,7 @@
 package com.bbg;
 
 import com.bbg.mapper.ClientAndSaleMapper;
+import com.bbg.pojo.IndexTable;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,7 +19,8 @@ public class BhbiApplicationTests {
 
 	@Test
 	public void contextLoads() {
-		List<String> result = clientAndSaleMapper.selectSqList();
+		List<IndexTable> result;
+		result = clientAndSaleMapper.selectIndexTable(null);
 		System.out.println(result);
 	}
 

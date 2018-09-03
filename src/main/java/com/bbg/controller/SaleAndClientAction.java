@@ -9,6 +9,7 @@ import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -31,20 +32,7 @@ public class SaleAndClientAction {
     @Autowired
     private ClientAndSaleMapper clientAndSaleMapper;
 
-    /*@RequestMapping("/selectSaleAndClient")
-    public String selectSaleAndClient(ModelMap map){
-        //获取省区列表
-        List<String> sqList = clientAndSaleMapper.selectSqList();
-        map.addAttribute("sqList",sqList);
 
-        //查询门店信息
-       PageHelper.startPage(1,5);
-        List<SaleAndClient> saleAndClient =  clientAndSaleMapper.selectSaleAndClient();
-        PageInfo pageInfo = new PageInfo(saleAndClient);
-        map.addAttribute("pageInfo",pageInfo);
-
-        return "index";
-    }*/
 
     @RequestMapping("/selectSaleAndClient")
     public String selectSaleAndClient(ModelMap map){
@@ -57,6 +45,19 @@ public class SaleAndClientAction {
         List<ShopInfo> shops = clientAndSaleMapper.selectAllShop();
         map.addAttribute("page_shops",shops);
         return "index";
+    }
+
+    @RequestMapping("/selectSaleAndClientTable")
+    public String selectSaleAndClientTable(ModelMap map){
+
+        //获取省区列表
+        List<String> sqList = clientAndSaleMapper.selectSqList();
+        map.addAttribute("sqList",sqList);
+
+        //获取所有门店
+        List<ShopInfo> shops = clientAndSaleMapper.selectAllShop();
+        map.addAttribute("page_shops",shops);
+        return "indexTable";
     }
 
     @RequestMapping("/selectSaleAndClientEchart")
@@ -72,6 +73,88 @@ public class SaleAndClientAction {
         return "indexEchart";
     }
 
+    @ResponseBody
+    @RequestMapping("/ajaxSelectSaleAndClientIndexTbale")
+    public ResponseObj ajaxSelectSaleAndClientIndexTbale(HttpServletRequest request,SaleAndClientRequireParam param){
+        String shops_gc_kb = "";
+        String shops_gc = "";
+        String shops_bh_kb = "";
+        String shops_bh = "";
+        String shops_kb = "";
+        String shops_qb = "";
+
+        ResponseObj responseObj = new ResponseObj();
+        responseObj.setStatus("200");
+        responseObj.setObj("SUCCESS");
+        request.getSession().setAttribute("paramIndexTbale",param);
+        List<IndexTable> saleAndClient =  clientAndSaleMapper.selectIndexTable(param);
+        for(int i=0;i<saleAndClient.size();i++){
+            IndexTable temp = saleAndClient.get(i);
+            shops_qb  += ","+temp.getShopId();
+            if(temp.getShopYt().equals("广场")){
+                shops_gc +=","+ temp.getShopId();
+                if(temp.getKbType().equals("1")){
+                    shops_gc_kb += ","+temp.getShopId();
+                    shops_kb  += ","+temp.getShopId();
+                }
+            }
+
+            if(temp.getShopYt().equals("百货")){
+                shops_bh += ","+temp.getShopId();
+                if(temp.getKbType().equals("1")){
+                    shops_bh_kb += ","+temp.getShopId();
+                    shops_kb  += ","+temp.getShopId();
+                }
+            }
+        }
+        //shops_gc_kb 广场可比店
+        if(!StringUtils.isEmpty(shops_gc_kb)){
+            param.setShopId(shops_gc_kb.substring(1));
+            IndexTable indexTable_shops_gc_kb= clientAndSaleMapper.selectIndexTableByShopId(param);
+            indexTable_shops_gc_kb.setShopName("广场可比店");
+            saleAndClient.add(indexTable_shops_gc_kb);
+        }
+
+        //shops_gc 广场业态合计
+        if(!StringUtils.isEmpty(shops_gc)){
+            param.setShopId(shops_gc.substring(1));
+            IndexTable indexTable_shops_gc= clientAndSaleMapper.selectIndexTableByShopId(param);
+            indexTable_shops_gc.setShopName("广场业态合计");
+            saleAndClient.add(indexTable_shops_gc);
+        }
+        //shops_bh_kb 百货可比店
+        if(!StringUtils.isEmpty(shops_bh_kb)){
+            param.setShopId(shops_bh_kb.substring(1));
+            IndexTable indexTable_shops_bh_kb= clientAndSaleMapper.selectIndexTableByShopId(param);
+            indexTable_shops_bh_kb.setShopName("百货可比店");
+            saleAndClient.add(indexTable_shops_bh_kb);
+        }
+
+
+        //shops_bh 百货业态合计
+        if(!StringUtils.isEmpty(shops_bh)) {
+            param.setShopId(shops_bh.substring(1));
+            IndexTable indexTable_shops_bh = clientAndSaleMapper.selectIndexTableByShopId(param);
+            indexTable_shops_bh.setShopName("百货业态合计");
+            saleAndClient.add(indexTable_shops_bh);
+        }
+        //shops_kb 可比店
+        if(!StringUtils.isEmpty(shops_kb)) {
+            param.setShopId(shops_kb.substring(1));
+            IndexTable indexTable_shops_kb = clientAndSaleMapper.selectIndexTableByShopId(param);
+            indexTable_shops_kb.setShopName("可比店");
+            saleAndClient.add(indexTable_shops_kb);
+        }
+        //shops_qb 全比店
+        if(!StringUtils.isEmpty(shops_qb)) {
+            param.setShopId(shops_qb.substring(1));
+            IndexTable indexTable_shops_qb = clientAndSaleMapper.selectIndexTableByShopId(param);
+            indexTable_shops_qb.setShopName("全比店");
+            saleAndClient.add(indexTable_shops_qb);
+        }
+        responseObj.setObj(saleAndClient);
+        return responseObj;
+    }
 
 
     @ResponseBody
@@ -162,7 +245,7 @@ public class SaleAndClientAction {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
         SaleAndClientRequireParam param = (SaleAndClientRequireParam) request.getSession().getAttribute("param");
         List<SaleAndClient> saleAndClient =  clientAndSaleMapper.selectSaleAndClient(param);
-        String[] title = {"门店ID","门店名称","销售（万元）","会员销售（万元）","客流","交易笔数","日期"};
+        String[] title = {"门店ID","门店名称","业态","省区","销售（万元）","交易笔数","同比销售增长","毛利率","会员销售（万元）","客流","租户销售(万元)","日期"};
         String fileName = "客流销售分析"+sdf.format(new Date())+".xls";
         String sheetName = "客流销售";
         String[][] content = new String[saleAndClient.size()][];
@@ -171,11 +254,16 @@ public class SaleAndClientAction {
             SaleAndClient obj = saleAndClient.get(i);
             content[i][0] = obj.getShopId();
             content[i][1] = obj.getShopName();
-            content[i][2] = obj.getXsje()+"";
-            content[i][3] = obj.getHyxs()+"";
-            content[i][4] = obj.getKll()+"";
+            content[i][2] = obj.getYt();
+            content[i][3] = obj.getSq();
+            content[i][4] = obj.getXsje()+"";
             content[i][5] = obj.getXsbs()+"";
-            content[i][6] = obj.getZfrq()+"";
+            content[i][6] = obj.getXsjekbRate()+"";
+            content[i][7] = obj.getMll()+"";
+            content[i][8] = obj.getHyxs()+"";
+            content[i][9] = obj.getKll()+"";
+            content[i][10] = obj.getGmv()+"";
+            content[i][11] = obj.getZfrq()+"";
         }
 
         HSSFWorkbook wb = ExcelUtil.getHSSFWorkbook(sheetName, title, content, null);

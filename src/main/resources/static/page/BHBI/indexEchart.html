@@ -403,9 +403,9 @@
 
 		 $(function(){
 		     $("#startTime").val(formatDate(now_time).substr(0,6)+'01');
-             $("#endTime").val(formatDate(now_time));
-             $("#startTimedb").val(formatDate(new Date(now_time  - 364 * 24 * 3600 * 1000)).substr(0,6)+'01');
-             $("#endTimedb").val(formatDate(new Date(now_time - 365 * 24 * 3600 * 1000)));
+             $("#endTime").val(formatDate(new Date(now_time - 24*60*60*1000)));
+             $("#startTimedb").val(formatDate(new Date(now_time  - 365 * 24 * 3600 * 1000)).substr(0,6)+'01');
+             $("#endTimedb").val(formatDate(new Date(now_time - 366 * 24 * 3600 * 1000)));
              getNewPage('',$("#startTime").val(),$("#endTime").val(),$("#startTimedb").val(),$("#endTimedb").val(),$($(".shop_list_zq.active")[0]).attr("data"));
              $("#show_shop_div").on('click','.shop_item',function () {
                  var className = $(this).attr("class");

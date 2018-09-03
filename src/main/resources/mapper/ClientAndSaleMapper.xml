@@ -2,47 +2,146 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.bbg.mapper.ClientAndSaleMapper">
 
-    <select id="selectSaleAndClient"  resultType="com.bbg.pojo.SaleAndClient" parameterType="com.bbg.pojo.SaleAndClientRequireParam">
-
-
-            SELECT b.shopid as shopId,b.shopname as shopName,b.bj_yt as yt,b.sq as sq,sum(xsje) as xsje,sum(hyxs) as hyxs,
-            sum(kll) as kll,sum(xsbs) as xsbs,to_char(rq,'${timeType}') as zfrq ,
-            ROUND(decode(sum(xsje_kb),0,0,(sum(xsje)-sum(xsje_kb))/ sum(xsje_kb) *100 ),2) || '%'  as xsjekbRate ,
-            ROUND(decode(sum(xsje),0,0,sum(xsml)/ sum(xsje) *100 ),2) || '%'  as mll
-
-        <if test="timeType == 'yyyy-mm' or timeType == 'yyyy-q' ">
-            , ROUND(decode(sum(xsjh),0,0,sum(xsje)/ sum(xsjh) *100 ),2) || '%' as dcRate
-        </if>
-
-        FROM  ZH_MD_TBZS a,lp_bi_shop b WHERE a.shopid = b.shopid
+    <select id="selectIndexTable"  resultType="com.bbg.pojo.IndexTable" parameterType="com.bbg.pojo.SaleAndClientRequireParam">
+       select lp.shopId as shopId,lp.shopname as shopName,lp.bj_yt as shopYt,decode(nvl(b.xsje,0),0,0,1) as kbType, a.xsje,b.xsje as xsjeTq ,
+       TO_CHAR(ROUND(decode(b.xsje,0,0,(a.xsje-b.xsje)/b.xsje)*100,2), 'fm9999990.0999')|| '%' as xszz, a.xsbs as jybs,b.xsbs as jybsTq,
+       TO_CHAR(ROUND(decode(b.xsbs,0,0,(a.xsbs-b.xsbs)/b.xsbs)*100,2), 'fm9999990.0999')|| '%' as jybsZz , a.kll,b.kll as kllTq,
+       TO_CHAR(ROUND(decode(b.kll,0,0,(a.kll-b.kll)/b.kll)*100,2), 'fm9999990.0999')|| '%' as kllZz, a.kdj,b.kdj as kdjTq,
+       TO_CHAR(ROUND(decode(b.kdj,0,0,(a.kdj-b.kdj)/b.kdj)*100,2), 'fm9999990.0999')|| '%' as kdjZz from lp_bi_shop lp left join (select shopId,
+       shopName,sum(xsje) as xsje,sum(xsbs) as xsbs,sum(kll) as kll,round(decode(sum(xsbs),0,0,sum(xsje)*10000/sum(xsbs)),2) as kdj
+       from ZH_MD_TBZS where rq between to_date('${startTime}','yyyymmdd') and to_date('${endTime}','yyyymmdd') group by shopId,shopName) a
+       ON lp.shopid = a.shopid LEFT JOIN (select shopId,sum(xsje) as xsje,sum(xsbs) as xsbs,sum(kll) as kll,
+       round(decode(sum(xsbs),0,0,sum(xsje)*10000/sum(xsbs)),2) as kdj from ZH_MD_TBZS where rq between to_date('${startTimedb}','yyyymmdd')
+       and to_date('${endTimedb}','yyyymmdd') group by shopId) b ON a.shopId = b.shopId  Where lp.bj_bd = 0 and lp.xs_bj = 1
 
         <if test=" shopId != '' and shopId != null " >
-            and b.shopId in (${shopId})
+            AND  lp.shopid IN (${shopId})
         </if>
-
-        <if test=" startTime != '' and startTime != null " >
-            and rq between  to_date(#{startTime},'yyyymmdd') and to_date(#{endTime},'yyyymmdd')
-        </if>
-        group by to_char(rq,'${timeType}'),b.shopid ,b.shopname,b.bj_yt,b.sq
-        order by zfrq ,xsje desc
     </select>
 
-    <!--<select id="selectSaleAndClient"  resultType="com.bbg.pojo.SaleAndClient" parameterType="com.bbg.pojo.SaleAndClientRequireParam">
-       SELECT b.shopid as shopId,b.shopname as shopName,b.bj_yt as yt,b.sq as sq,sum(xsje) as xsje,sum(hyxs) as hyxs,
-       sum(kll) as kll,sum(xsbs) as xsbs,to_char(rq,'${timeType}') as zfrq
-
-        FROM  ZH_MD_TBZS a,lp_bi_shop b WHERE a.shopid = b.shopid
-
+    <select id="selectIndexTableByShopId"  resultType="com.bbg.pojo.IndexTable" parameterType="com.bbg.pojo.SaleAndClientRequireParam">
+       select sum(xsje) as xsje,sum(xsjetq) as xsjetq,
+       TO_CHAR(ROUND(decode(sum(xsjetq), 0, 0, (sum(xsje) - sum(xsjetq)) / sum(xsjetq)) * 100,2), 'fm9999990.0999') || '%' as xszz,
+        sum(jybs) as jybs,sum(jybstq) as jybstq,
+        TO_CHAR(ROUND(decode(sum(jybstq), 0, 0, (sum(jybs) - sum(jybstq)) / sum(jybstq)) * 100, 2), 'fm9999990.0999') || '%' as jybsZz,
+        sum(kll) as kll,sum(kllTq) as kllTq, TO_CHAR(ROUND(decode(sum(kllTq), 0, 0, (sum(kll) - sum(kllTq)) / sum(kllTq)) * 100, 2),
+         'fm9999990.0999') || '%' as kllZz, round(decode(sum(jybs), 0, 0, sum(xsje) * 10000 / sum(jybs)), 2) as kdj,
+         round(decode(sum(jybstq), 0, 0, sum(xsjetq) * 10000 / sum(jybstq)), 2) as kdjTq, TO_CHAR(ROUND(decode(round(decode(sum(jybstq), 0, 0,
+         sum(xsjetq) * 10000 / sum(jybstq)), 2), 0, 0, (round(decode(sum(jybs), 0, 0, sum(xsje) * 10000 / sum(jybs)), 2) -
+         round(decode(sum(jybstq), 0, 0, sum(xsjetq) * 10000 / sum(jybstq)), 2)) / round(decode(sum(jybstq), 0, 0,
+         sum(xsjetq) * 10000 / sum(jybstq)), 2)) * 100, 2), 'fm9999990.0999') || '%' as kdjZz from ( select lp.shopId as shopId,
+         lp.shopname as shopName, lp.bj_yt as shopYt, decode(nvl(b.xsje, 0), 0, 0, 1) as kbType, a.xsje, b.xsje as xsjeTq, a.xsbs as jybs,
+         b.xsbs as jybsTq, a.kll, b.kll as kllTq from lp_bi_shop lp left join (select shopId, shopName, sum(xsje) as xsje, sum(xsbs) as xsbs,
+         sum(kll) as kll from ZH_MD_TBZS where rq between to_date('${startTime}', 'yyyymmdd') and to_date('${endTime}', 'yyyymmdd')
+         group by shopId, shopName) a ON lp.shopid = a.shopid LEFT JOIN (select shopId, sum(xsje) as xsje, sum(xsbs) as xsbs, sum(kll) as kll,
+         round(decode(sum(xsbs), 0, 0, sum(xsje) * 10000 / sum(xsbs)), 2) as kdj from ZH_MD_TBZS where rq between
+         to_date('${startTimedb}', 'yyyymmdd') and to_date('${endTimedb}', 'yyyymmdd') group by shopId) b ON a.shopId = b.shopId Where lp.bj_bd = 0
+         and lp.xs_bj = 1
         <if test=" shopId != '' and shopId != null " >
-            and b.shopId in (${shopId})
+            AND  lp.shopid IN (${shopId})
+        </if>
+
+         )
+    </select>
+
+
+
+
+    <select id="selectSaleAndClient"  resultType="com.bbg.pojo.SaleAndClient" parameterType="com.bbg.pojo.SaleAndClientRequireParam">
+        <if test=' dbType == "1" ' >
+            select a.shopId,a.shopName,a.yt,a.sq,a.xsje,a.gmv,a.hyxs,a.kll,a.xsbs,a.mll,
+            TO_CHAR(ROUND(decode(b.xsjedb,0,0,(a.xsje-b.xsjedb)/b.xsjedb *100 ),2) , 'fm9999990.0999')|| '%'  as xsjekbRate
+            <if test="timeType == 'yyyy-mm' or timeType == 'yyyy-q' ">
+                , a.dcRate
+            </if>
+            from
+            (SELECT b.shopid as shopId,b.shopname as shopName,b.bj_yt as yt,b.sq as sq,sum(a.xsje) as xsje,
+            round((nvl(sum(c.xsje),0)+nvl(sum(d.xsje),0)+nvl(sum(e.xsje),0)+ nvl(sum(f.xsje),0))/10000,2) as gmv,
+            sum(a.hyxs) as hyxs,sum(a.kll) as kll,sum(a.xsbs) as xsbs,
+             TO_CHAR(ROUND(decode(sum(a.xsje),0,0,sum(a.xsml)/ sum(a.xsje) *100 ),2) , 'fm9999990.0999')|| '%'  as mll
+
+            <if test="timeType == 'yyyy-mm' or timeType == 'yyyy-q' ">
+                , TO_CHAR(ROUND(decode(sum(xsjh),0,0,sum(a.xsje)/ sum(xsjh) *100 ),2), 'fm9999990.0999') || '%' as dcRate
+            </if>
+
+            FROM  ZH_MD_TBZS a LEFT JOIN lp_bi_shop b ON a.shopid = b.shopid
+
+            LEFT JOIN (select d.shopid,d.shopname,sum(a.xsje) as xsje,a.jzrq as rq from  THREE_SALE a,shopdef b,malldef c,lp_bi_shop d
+            where a.shopid = b.id and b.mallid = c.id and c.code = d.ebs_mcid
+            group by  d.shopid,d.shopname,a.jzrq ) c ON c.shopid = a.shopid and a.rq = c.rq
+
+            LEFT JOIN (select e.shopid,sum(a.xsje) as xsje,a.jzrq as rq from  SALE a,skt b,shopdef c,malldef d ,lp_bi_shop e
+            where a.sktno = b.sktno  and b.shopid = c.id and c.mallid = d.id and d.code = e.ebs_mcid
+            group by a.jzrq,e.shopid  ) d ON d.shopid = a.shopid and a.rq = d.rq
+
+            LEFT JOIN (select e.shopid,sum(a.xsje) as xsje,a.jzrq as rq from  his_sale a,skt b,shopdef c,malldef d ,lp_bi_shop e
+            where a.sktno = b.sktno  and b.shopid = c.id and c.mallid = d.id and d.code = e.ebs_mcid
+            group by a.jzrq,e.shopid  ) e ON e.shopid = a.shopid and a.rq = e.rq
+
+            LEFT JOIN ( select d.shopid,sum(a.amount) as xsje,a.rq  from INPUTSALE a,shopdef b,malldef c,lp_bi_shop d
+            where a.shopid = b.id and b.mallid = c.id and c.code = d.ebs_mcid and status = 1
+            group by d.shopid,a.rq  ) f ON f.shopid = a.shopid and a.rq = f.rq
+
+
+
+
+            WHERE 1=1
+            <if test=" shopId != '' and shopId != null " >
+                and a.shopId in (${shopId})
+            </if>
+
+            <if test=" startTime != '' and startTime != null " >
+                and a.rq between  to_date(#{startTime},'yyyymmdd') and to_date(#{endTime},'yyyymmdd')
+            </if>
+                group by b.shopid ,b.shopname,b.bj_yt,b.sq)a  left join (
+            SELECT sum(xsje) as xsjedb,  shopid FROM ZH_MD_TBZS where rq between to_date(#{startTimedb}, 'yyyymmdd')
+            and to_date(#{endTimedb}, 'yyyymmdd') group by shopid
+            ) b ON   a.shopid = b.shopid
+        </if>
+
+        <if test=' dbType == "0" ' >
+        SELECT b.shopid as shopId,b.shopname as shopName,b.bj_yt as yt,b.sq as sq,sum(a.xsje) as xsje,
+        round((nvl(sum(c.xsje),0)+nvl(sum(d.xsje),0)+nvl(sum(e.xsje),0)+ nvl(sum(f.xsje),0))/10000,2) as gmv,
+        sum(a.hyxs) as hyxs,sum(a.kll) as kll,sum(a.xsbs) as xsbs,
+            to_char(a.rq,'${timeType}') as zfrq ,
+            TO_CHAR(ROUND(decode(sum(a.xsje_kb),0,0,(sum(a.xsje)-sum(a.xsje_kb))/ sum(a.xsje_kb) *100 ),2), 'fm9999990.0999') || '%'  as xsjekbRate ,
+        TO_CHAR(ROUND(decode(sum(a.xsje),0,0,sum(a.xsml)/ sum(a.xsje) *100 ),2) , 'fm9999990.0999')|| '%'  as mll
+
+        <if test="timeType == 'yyyy-mm' or timeType == 'yyyy-q' ">
+            , TO_CHAR(ROUND(decode(sum(xsjh),0,0,sum(a.xsje)/ sum(xsjh) *100 ),2), 'fm9999990.0999') || '%' as dcRate
+        </if>
+
+        FROM  ZH_MD_TBZS a LEFT JOIN lp_bi_shop b ON a.shopid = b.shopid
+
+        LEFT JOIN (select d.shopid,d.shopname,sum(a.xsje) as xsje,a.jzrq as rq from  THREE_SALE a,shopdef b,malldef c,lp_bi_shop d
+        where a.shopid = b.id and b.mallid = c.id and c.code = d.ebs_mcid
+        group by  d.shopid,d.shopname,a.jzrq ) c ON c.shopid = a.shopid and a.rq = c.rq
+
+        LEFT JOIN (select e.shopid,sum(a.xsje) as xsje,a.jzrq as rq from  SALE a,skt b,shopdef c,malldef d ,lp_bi_shop e
+        where a.sktno = b.sktno  and b.shopid = c.id and c.mallid = d.id and d.code = e.ebs_mcid
+        group by a.jzrq,e.shopid  ) d ON d.shopid = a.shopid and a.rq = d.rq
+
+        LEFT JOIN (select e.shopid,sum(a.xsje) as xsje,a.jzrq as rq from  his_sale a,skt b,shopdef c,malldef d ,lp_bi_shop e
+        where a.sktno = b.sktno  and b.shopid = c.id and c.mallid = d.id and d.code = e.ebs_mcid
+        group by a.jzrq,e.shopid  ) e ON e.shopid = a.shopid and a.rq = e.rq
+
+        LEFT JOIN ( select d.shopid,sum(a.amount) as xsje,a.rq  from INPUTSALE a,shopdef b,malldef c,lp_bi_shop d
+        where a.shopid = b.id and b.mallid = c.id and c.code = d.ebs_mcid and status = 1
+        group by d.shopid,a.rq  ) f ON f.shopid = a.shopid and a.rq = f.rq
+        WHERE 1=1
+        <if test=" shopId != '' and shopId != null " >
+            and a.shopId in (${shopId})
         </if>
 
         <if test=" startTime != '' and startTime != null " >
-            and rq between  to_date(#{startTime},'yyyymmdd') and to_date(#{endTime},'yyyymmdd')
+            and a.rq between  to_date(#{startTime},'yyyymmdd') and to_date(#{endTime},'yyyymmdd')
         </if>
-          group by to_char(rq,'${timeType}'),b.shopid ,b.shopname,b.bj_yt,b.sq
+            group by to_char(a.rq,'${timeType}'),b.shopid ,b.shopname,b.bj_yt,b.sq
             order by zfrq ,xsje desc
-    </select>-->
+        </if>
+
+
+    </select>
 
 
     <select id="selectSaleAndClientParse"  resultType="com.bbg.pojo.SaleAndClient" parameterType="com.bbg.pojo.SaleAndClientRequireParam">
@@ -60,7 +159,7 @@
 
 
   <select id="selectSqList" resultType="String">
-     select distinct sq  from lp_bi_shop
+      select distinct sq  from lp_bi_shop
   </select>
 
     <select id="selectAllShop" resultType="com.bbg.pojo.ShopInfo">

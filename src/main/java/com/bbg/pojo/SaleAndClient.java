@@ -17,7 +17,7 @@ public class SaleAndClient {
     private String xsjekbRate;//可比销售增长
     private String dcRate;//达成
     private String mll;//毛利率
-    private int gmv;
+    private double gmv;
 
     public String getXsjekbRate() {
         return xsjekbRate;
@@ -43,11 +43,11 @@ public class SaleAndClient {
         this.mll = mll;
     }
 
-    public int getGmv() {
+    public double getGmv() {
         return gmv;
     }
 
-    public void setGmv(int gmv) {
+    public void setGmv(double gmv) {
         this.gmv = gmv;
     }
 
