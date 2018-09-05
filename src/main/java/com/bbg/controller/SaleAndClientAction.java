@@ -440,6 +440,7 @@ public class SaleAndClientAction {
         List<ClientTableDTO> res = new ArrayList<>();
         responseObj.setStatus("200");
         responseObj.setObj("SUCCESS");
+        request.getSession().setAttribute("paramIndexTbale",param);
         ClientTableDTO clientTableDTO = new ClientTableDTO();
         param.setDescTxt(param.getStartTime()+"-"+param.getEndTime() + " 对比 "+param.getStartTimedb()+"-"+param.getEndTimedb());
         //区间汇总
@@ -584,56 +585,140 @@ public class SaleAndClientAction {
 } catch (Exception e) {
        e.printStackTrace();
  }
-
-
     }
 
-    /*@RequestMapping(value = "/exportClientTable")
-    @ResponseBody
-    public void exportClientTable(HttpServletRequest request, HttpServletResponse response){
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
-        HSSFWorkbook wb = new HSSFWorkbook();
-        String fileName = "客流销售分析"+sdf.format(new Date())+".xls";
-        String sheetName = "客流销售";
-        HSSFSheet sheet = wb.createSheet(sheetName);
-
-        // 第三步，在sheet中添加表头第0行,注意老版本poi对Excel的行数列数有限制
-        HSSFRow row = sheet.createRow(0);
-
-        // 第四步，创建单元格，并设置值表头 设置表头居中
-        HSSFCellStyle style = wb.createCellStyle();
-        style.setAlignment(HSSFCellStyle.ALIGN_CENTER); // 创建一个居中格式
-        style.setFillBackgroundColor(HSSFColor.BLUE_GREY.index);
-        //声明列对象
-        HSSFCell cell = null;
-         cell = row.createCell(0);
-        cell.setCellValue("门店");
-        cell.setCellStyle(style);
-
-        cell = row.createCell(1);
-        cell.setCellValue("20180901-20180902 对比 20170901-20170902");
-        cell.setCellStyle(style);
-        sheet.addMergedRegion(new CellRangeAddress(0,0,1,5));
-
-        try {
-            this.setResponseHeader(response, fileName);
-            OutputStream os = response.getOutputStream();
-            wb.write(os);
-            os.flush();
-            os.close();
-        } catch (Exception e) {
-            e.printStackTrace();
+    public List<IndexTable> transfromToIndexList(List<IndexTable> saleAndClient){
+        List<IndexTable> res = new ArrayList<>();
+        for(int i=0;i<saleAndClient.size();i++) {
+            IndexTable temp = saleAndClient.get(i);
+            if (temp.getKbType() != null && temp.getKbType().equals("1") && temp.getShopYt().equals("广场")) {
+                res.add(temp);
+            }
         }
 
-    }*/
+        for(int i=0;i<saleAndClient.size();i++) {
+            IndexTable temp = saleAndClient.get(i);
+            if(temp.getShopName().equals("广场可比店")){
+                res.add(temp);
+            }
+        }
+
+        for(int i=0;i<saleAndClient.size();i++) {
+            IndexTable temp = saleAndClient.get(i);
+            if(temp.getKbType() != null && temp.getKbType().equals("0") && temp.getShopYt().equals("广场")){
+                res.add(temp);
+            }
+        }
+
+        for(int i=0;i<saleAndClient.size();i++) {
+            IndexTable temp = saleAndClient.get(i);
+            if(temp.getShopName().equals("广场业态合计")){
+                res.add(temp);
+            }
+        }
+        for(int i=0;i<saleAndClient.size();i++) {
+            IndexTable temp = saleAndClient.get(i);
+            if(temp.getKbType() != null && temp.getKbType().equals("1") && temp.getShopYt().equals("百货")){
+                res.add(temp);
+            }
+        }
+
+        for(int i=0;i<saleAndClient.size();i++) {
+            IndexTable temp = saleAndClient.get(i);
+            if(temp.getShopName().equals("百货可比店")){
+                res.add(temp);
+            }
+        }
+        for(int i=0;i<saleAndClient.size();i++) {
+            IndexTable temp = saleAndClient.get(i);
+            if(temp.getKbType() != null && temp.getKbType().equals("0") && temp.getShopYt().equals("百货")){
+                res.add(temp);
+            }
+        }
+        for(int i=0;i<saleAndClient.size();i++) {
+            IndexTable temp = saleAndClient.get(i);
+            if(temp.getShopName().equals("百货业态合计")){
+                res.add(temp);
+            }
+        }
+        for(int i=0;i<saleAndClient.size();i++) {
+            IndexTable temp = saleAndClient.get(i);
+            if(temp.getKbType() != null && temp.getKbType().equals("1") && temp.getShopYt().equals("生活广场")){
+                res.add(temp);
+            }
+        }
+        for(int i=0;i<saleAndClient.size();i++) {
+            IndexTable temp = saleAndClient.get(i);
+            if(temp.getShopName().equals("生活可比店")){
+                res.add(temp);
+            }
+        }
+        for(int i=0;i<saleAndClient.size();i++) {
+            IndexTable temp = saleAndClient.get(i);
+            if(temp.getKbType() != null && temp.getKbType().equals("0") && temp.getShopYt().equals("生活广场")){
+                res.add(temp);
+            }
+        }
+        for(int i=0;i<saleAndClient.size();i++) {
+            IndexTable temp = saleAndClient.get(i);
+            if(temp.getShopName().equals("生活广场合计")){
+                res.add(temp);
+            }
+        }
+        for(int i=0;i<saleAndClient.size();i++) {
+            IndexTable temp = saleAndClient.get(i);
+            if(temp.getShopName().equals("可比店")){
+                res.add(temp);
+            }
+        }
+        for(int i=0;i<saleAndClient.size();i++) {
+            IndexTable temp = saleAndClient.get(i);
+            if(temp.getShopName().equals("全比店")){
+                res.add(temp);
+            }
+        }
+        return res;
+    }
+
+    public HSSFWorkbook getHSSFWorkbookByParam(ClientTableDTO clientTableDTO,HSSFWorkbook wb,String fileName){
+
+        List<IndexTable> saleAndClient = transfromToIndexList(clientTableDTO.getRes());
+        String[] title = {"","本期","同期","增长","本期","同期","增长","本期","同期","增长","本期","同期","增长"};
+
+        String sheetName = "客流销售";
+        String[][] content = new String[saleAndClient.size()][];
+        for (int i = 0; i < saleAndClient.size(); i++) {
+            content[i] = new String[title.length];
+            IndexTable obj = saleAndClient.get(i);
+            content[i][0] = obj.getShopName();
+            content[i][1] = obj.getXsje()+"";
+            content[i][2] = obj.getXsjeTq()+"";
+            content[i][3] = obj.getXszz()+"";
+            content[i][4] = obj.getJybs()+"";
+            content[i][5] = obj.getJybsTq()+"";
+            content[i][6] = obj.getJybsZz()+"";
+            content[i][7] = obj.getKll()+"";
+            content[i][8] = obj.getKllTq()+"";
+            content[i][9] = obj.getKllZz()+"";
+            content[i][10] = obj.getKdj()+"";
+            content[i][11] = obj.getKdjTq()+"";
+            content[i][12] = obj.getKdjZz()+"";
+        }
+
+        HSSFWorkbook resWb = ExcelUtil.getHSSFWorkbookAuto(sheetName, title, content, wb,clientTableDTO.getTitle());
+        return resWb;
+    }
+
     @RequestMapping(value = "/exportClientTable")
     @ResponseBody
     public void exportClientTable(HttpServletRequest request, HttpServletResponse response){
         SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
+        String fileName = "客流销售分析"+sdf.format(new Date())+".xls";
+       // SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
         SaleAndClientRequireParam param = (SaleAndClientRequireParam) request.getSession().getAttribute("paramIndexTbale");
        // List<SaleAndClient> saleAndClient =  clientAndSaleMapper.selectSaleAndClient(param);
-        List<IndexTable> saleAndClient = getIndexTableList(param);
-        String[] title = {"门店ID","本期","同期","增长","本期","同期","增长","本期","同期","增长","本期","同期","增长",};
+       /* List<IndexTable> saleAndClient = getIndexTableList(param);
+        String[] title = {"","本期","同期","增长","本期","同期","增长","本期","同期","增长","本期","同期","增长"};
         String fileName = "客流销售分析"+sdf.format(new Date())+".xls";
         String sheetName = "客流销售";
         String[][] content = new String[saleAndClient.size()][];
@@ -655,7 +740,30 @@ public class SaleAndClientAction {
             content[i][12] = obj.getKdjZz()+"";
         }
 
-        HSSFWorkbook wb = ExcelUtil.getHSSFWorkbook(sheetName, title, content, null);
+        HSSFWorkbook wb = ExcelUtil.getHSSFWorkbookAuto(sheetName, title, content, null,0);*/
+       // System.out.println("_-------------------------"+wb.getSheetAt(0).getLastRowNum());
+
+        List<ClientTableDTO> res = new ArrayList<>();
+        ClientTableDTO clientTableDTO = new ClientTableDTO();
+        param.setDescTxt(param.getStartTime()+"-"+param.getEndTime() + " 对比 "+param.getStartTimedb()+"-"+param.getEndTimedb());
+        //区间汇总
+        clientTableDTO.setTitle(param.getDescTxt());
+        clientTableDTO.setRes(getIndexTableList(param));
+        res.add(clientTableDTO);
+        //分段汇总
+        List<SaleAndClientRequireParam> saleAndClientRequireParams = geneateSaleAndClientRequireParam(param);
+        for(int i=0;i<saleAndClientRequireParams.size();i++){
+            SaleAndClientRequireParam temp_param = saleAndClientRequireParams.get(i);
+            ClientTableDTO clientTableDTO_temp = new ClientTableDTO();
+            clientTableDTO_temp.setTitle(temp_param.getDescTxt());
+            clientTableDTO_temp.setRes(getIndexTableList(temp_param));
+            res.add(clientTableDTO_temp);
+        }
+        HSSFWorkbook wb = null;
+        for(int i=0;i<res.size();i++){
+            wb = getHSSFWorkbookByParam(res.get(i),wb,fileName);
+        }
+
         try {
             this.setResponseHeader(response, fileName);
             OutputStream os = response.getOutputStream();
