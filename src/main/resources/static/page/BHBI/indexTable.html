@@ -68,10 +68,27 @@
 			background: #fff url(/page/BHBI/images/loaderc.gif) no-repeat center center;
 		}
 
-		.thead_tr >th,.tbody_tr>td{
+		.thead_tr >th {
+			background-color: #366091;
+			color: white;
+			border: 1px solid #A5A5A5 !important;
 			text-align: center;
 			vertical-align: middle !important;
-			border: 1px solid #ddd !important;
+		}
+		.tbody_tr>td{
+			text-align: center;
+			vertical-align: middle !important;
+			border: 1px solid black !important;
+
+		}
+		.hz_tr {
+			background-color: #FDD5B5;
+		}
+		.yt_hj_tr{
+			background-color: #D9D9D9;
+		}
+		.zz_td_red{
+			color: red;
 		}
 	</style>
 
@@ -282,95 +299,101 @@
               $("#tbody_container").empty();
               $.each(data,function (index,temp) {
                   if(temp.kbType == '1' && temp.shopYt == '广场'){
-                      var temp_tr = "<tr class='tbody_tr'> <td>"+temp.shopName+"</td> <td>"+temp.xsje+"</td> <td>"+temp.xsjeTq+"</td> <td>"+temp.xszz+"</td> <td>"+temp.jybs+"</td> " +
-                          " <td>"+temp.jybsTq+"</td> <td>"+temp.jybsZz+"</td>  <td>"+temp.kll+"</td> <td>"+temp.kllTq+"</td> <td>"+temp.kllZz+"</td> <td>"+temp.kdj+"</td> " +
-                          "<td>"+temp.kdjTq+"</td><td>"+temp.kdjZz+"</td> </tr>";
+                      var temp_tr = "<tr class='tbody_tr'> <td>"+temp.shopName+"</td> <td>"+temp.xsje+"</td> <td>"+temp.xsjeTq+"</td> <td class='zz_td'>"+temp.xszz+"</td> <td>"+temp.jybs+"</td> " +
+                          " <td>"+temp.jybsTq+"</td> <td class='zz_td'>"+temp.jybsZz+"</td>  <td>"+temp.kll+"</td> <td>"+temp.kllTq+"</td> <td class='zz_td'>"+temp.kllZz+"</td> <td>"+temp.kdj+"</td> " +
+                          "<td>"+temp.kdjTq+"</td><td class='zz_td'>"+temp.kdjZz+"</td> </tr>";
                       $("#tbody_container").append(temp_tr);
 				  }
 
               })
               $.each(data,function (index,temp) {
                   if(temp.shopName == '广场可比店'){
-                      var temp_tr = "<tr class='tbody_tr'> <td>"+temp.shopName+"</td> <td>"+temp.xsje+"</td> <td>"+temp.xsjeTq+"</td> <td>"+temp.xszz+"</td> <td>"+temp.jybs+"</td> " +
-                          " <td>"+temp.jybsTq+"</td> <td>"+temp.jybsZz+"</td>  <td>"+temp.kll+"</td> <td>"+temp.kllTq+"</td> <td>"+temp.kllZz+"</td> <td>"+temp.kdj+"</td> " +
-                          "<td>"+temp.kdjTq+"</td><td>"+temp.kdjZz+"</td> </tr>";
+                      var temp_tr = "<tr class='tbody_tr hz_tr'> <td>"+temp.shopName+"</td> <td>"+temp.xsje+"</td> <td>"+temp.xsjeTq+"</td> <td class='zz_td'>"+temp.xszz+"</td> <td>"+temp.jybs+"</td> " +
+                          " <td>"+temp.jybsTq+"</td> <td class='zz_td'>"+temp.jybsZz+"</td>  <td>"+temp.kll+"</td> <td>"+temp.kllTq+"</td> <td class='zz_td'>"+temp.kllZz+"</td> <td>"+temp.kdj+"</td> " +
+                          "<td>"+temp.kdjTq+"</td><td class='zz_td'>"+temp.kdjZz+"</td> </tr>";
                       $("#tbody_container").append(temp_tr);
                   }
 
               })
               $.each(data,function (index,temp) {
                   if(temp.kbType == '0' && temp.shopYt == '广场'){
-                      var temp_tr = "<tr class='tbody_tr'> <td>"+temp.shopName+"</td> <td>"+temp.xsje+"</td> <td>"+temp.xsjeTq+"</td> <td>"+temp.xszz+"</td> <td>"+temp.jybs+"</td> " +
-                          " <td>"+temp.jybsTq+"</td> <td>"+temp.jybsZz+"</td>  <td>"+temp.kll+"</td> <td>"+temp.kllTq+"</td> <td>"+temp.kllZz+"</td> <td>"+temp.kdj+"</td> " +
-                          "<td>"+temp.kdjTq+"</td><td>"+temp.kdjZz+"</td> </tr>";
+                      var temp_tr = "<tr class='tbody_tr'> <td>"+temp.shopName+"</td> <td>"+temp.xsje+"</td> <td>"+temp.xsjeTq+"</td> <td class='zz_td'>"+temp.xszz+"</td> <td>"+temp.jybs+"</td> " +
+                          " <td>"+temp.jybsTq+"</td> <td class='zz_td'>"+temp.jybsZz+"</td>  <td>"+temp.kll+"</td> <td>"+temp.kllTq+"</td> <td class='zz_td'>"+temp.kllZz+"</td> <td>"+temp.kdj+"</td> " +
+                          "<td>"+temp.kdjTq+"</td><td class='zz_td'>"+temp.kdjZz+"</td> </tr>";
                       $("#tbody_container").append(temp_tr);
                   }
 
               })
               $.each(data,function (index,temp) {
                   if(temp.shopName == '广场业态合计'){
-                      var temp_tr = "<tr class='tbody_tr'> <td>"+temp.shopName+"</td> <td>"+temp.xsje+"</td> <td>"+temp.xsjeTq+"</td> <td>"+temp.xszz+"</td> <td>"+temp.jybs+"</td> " +
-                          " <td>"+temp.jybsTq+"</td> <td>"+temp.jybsZz+"</td>  <td>"+temp.kll+"</td> <td>"+temp.kllTq+"</td> <td>"+temp.kllZz+"</td> <td>"+temp.kdj+"</td> " +
-                          "<td>"+temp.kdjTq+"</td><td>"+temp.kdjZz+"</td> </tr>";
+                      var temp_tr = "<tr class='tbody_tr yt_hj_tr'> <td>"+temp.shopName+"</td> <td>"+temp.xsje+"</td> <td>"+temp.xsjeTq+"</td> <td class='zz_td'>"+temp.xszz+"</td> <td>"+temp.jybs+"</td> " +
+                          " <td>"+temp.jybsTq+"</td> <td class='zz_td'>"+temp.jybsZz+"</td>  <td>"+temp.kll+"</td> <td>"+temp.kllTq+"</td> <td class='zz_td'>"+temp.kllZz+"</td> <td>"+temp.kdj+"</td> " +
+                          "<td>"+temp.kdjTq+"</td><td class='zz_td'>"+temp.kdjZz+"</td> </tr>";
                       $("#tbody_container").append(temp_tr);
                   }
 
               })
              $.each(data,function (index,temp) {
                   if(temp.kbType == '1' && temp.shopYt == '百货'){
-                      var temp_tr = "<tr class='tbody_tr'> <td>"+temp.shopName+"</td> <td>"+temp.xsje+"</td> <td>"+temp.xsjeTq+"</td> <td>"+temp.xszz+"</td> <td>"+temp.jybs+"</td> " +
-                          " <td>"+temp.jybsTq+"</td> <td>"+temp.jybsZz+"</td>  <td>"+temp.kll+"</td> <td>"+temp.kllTq+"</td> <td>"+temp.kllZz+"</td> <td>"+temp.kdj+"</td> " +
-                          "<td>"+temp.kdjTq+"</td><td>"+temp.kdjZz+"</td> </tr>";
+                      var temp_tr = "<tr class='tbody_tr'> <td>"+temp.shopName+"</td> <td>"+temp.xsje+"</td> <td>"+temp.xsjeTq+"</td> <td class='zz_td'>"+temp.xszz+"</td> <td>"+temp.jybs+"</td> " +
+                          " <td>"+temp.jybsTq+"</td> <td class='zz_td'>"+temp.jybsZz+"</td>  <td>"+temp.kll+"</td> <td>"+temp.kllTq+"</td> <td class='zz_td'>"+temp.kllZz+"</td> <td>"+temp.kdj+"</td> " +
+                          "<td>"+temp.kdjTq+"</td><td class='zz_td'>"+temp.kdjZz+"</td> </tr>";
                       $("#tbody_container").append(temp_tr);
                   }
 
               })
              $.each(data,function (index,temp) {
                   if(temp.shopName == '百货可比店'){
-                      var temp_tr = "<tr class='tbody_tr'> <td>"+temp.shopName+"</td> <td>"+temp.xsje+"</td> <td>"+temp.xsjeTq+"</td> <td>"+temp.xszz+"</td> <td>"+temp.jybs+"</td> " +
-                          " <td>"+temp.jybsTq+"</td> <td>"+temp.jybsZz+"</td>  <td>"+temp.kll+"</td> <td>"+temp.kllTq+"</td> <td>"+temp.kllZz+"</td> <td>"+temp.kdj+"</td> " +
-                          "<td>"+temp.kdjTq+"</td><td>"+temp.kdjZz+"</td> </tr>";
+                      var temp_tr = "<tr class='tbody_tr hz_tr'> <td>"+temp.shopName+"</td> <td>"+temp.xsje+"</td> <td>"+temp.xsjeTq+"</td> <td class='zz_td'>"+temp.xszz+"</td> <td>"+temp.jybs+"</td> " +
+                          " <td>"+temp.jybsTq+"</td> <td class='zz_td'>"+temp.jybsZz+"</td>  <td>"+temp.kll+"</td> <td>"+temp.kllTq+"</td> <td class='zz_td'>"+temp.kllZz+"</td> <td>"+temp.kdj+"</td> " +
+                          "<td>"+temp.kdjTq+"</td><td class='zz_td'>"+temp.kdjZz+"</td> </tr>";
                       $("#tbody_container").append(temp_tr);
                   }
 
               })
               $.each(data,function (index,temp) {
                   if(temp.kbType == '0' && temp.shopYt == '百货'){
-                      var temp_tr = "<tr class='tbody_tr'> <td>"+temp.shopName+"</td> <td>"+temp.xsje+"</td> <td>"+temp.xsjeTq+"</td> <td>"+temp.xszz+"</td> <td>"+temp.jybs+"</td> " +
-                          " <td>"+temp.jybsTq+"</td> <td>"+temp.jybsZz+"</td>  <td>"+temp.kll+"</td> <td>"+temp.kllTq+"</td> <td>"+temp.kllZz+"</td> <td>"+temp.kdj+"</td> " +
-                          "<td>"+temp.kdjTq+"</td><td>"+temp.kdjZz+"</td> </tr>";
+                      var temp_tr = "<tr class='tbody_tr'> <td>"+temp.shopName+"</td> <td>"+temp.xsje+"</td> <td>"+temp.xsjeTq+"</td> <td class='zz_td'>"+temp.xszz+"</td> <td>"+temp.jybs+"</td> " +
+                          " <td>"+temp.jybsTq+"</td> <td class='zz_td'>"+temp.jybsZz+"</td>  <td>"+temp.kll+"</td> <td>"+temp.kllTq+"</td> <td class='zz_td'>"+temp.kllZz+"</td> <td>"+temp.kdj+"</td> " +
+                          "<td>"+temp.kdjTq+"</td><td class='zz_td'>"+temp.kdjZz+"</td> </tr>";
                       $("#tbody_container").append(temp_tr);
                   }
 
               })
               $.each(data,function (index,temp) {
                   if(temp.shopName == '百货业态合计'){
-                      var temp_tr = "<tr class='tbody_tr'> <td>"+temp.shopName+"</td> <td>"+temp.xsje+"</td> <td>"+temp.xsjeTq+"</td> <td>"+temp.xszz+"</td> <td>"+temp.jybs+"</td> " +
-                          " <td>"+temp.jybsTq+"</td> <td>"+temp.jybsZz+"</td>  <td>"+temp.kll+"</td> <td>"+temp.kllTq+"</td> <td>"+temp.kllZz+"</td> <td>"+temp.kdj+"</td> " +
-                          "<td>"+temp.kdjTq+"</td><td>"+temp.kdjZz+"</td> </tr>";
+                      var temp_tr = "<tr class='tbody_tr yt_hj_tr'> <td>"+temp.shopName+"</td> <td>"+temp.xsje+"</td> <td>"+temp.xsjeTq+"</td> <td class='zz_td'>"+temp.xszz+"</td> <td>"+temp.jybs+"</td> " +
+                          " <td>"+temp.jybsTq+"</td> <td class='zz_td'>"+temp.jybsZz+"</td>  <td>"+temp.kll+"</td> <td>"+temp.kllTq+"</td> <td class='zz_td'>"+temp.kllZz+"</td> <td>"+temp.kdj+"</td> " +
+                          "<td>"+temp.kdjTq+"</td><td class='zz_td'>"+temp.kdjZz+"</td> </tr>";
                       $("#tbody_container").append(temp_tr);
                   }
 
               })
               $.each(data,function (index,temp) {
                   if(temp.shopName == '可比店'){
-                      var temp_tr = "<tr class='tbody_tr'> <td>"+temp.shopName+"</td> <td>"+temp.xsje+"</td> <td>"+temp.xsjeTq+"</td> <td>"+temp.xszz+"</td> <td>"+temp.jybs+"</td> " +
-                          " <td>"+temp.jybsTq+"</td> <td>"+temp.jybsZz+"</td>  <td>"+temp.kll+"</td> <td>"+temp.kllTq+"</td> <td>"+temp.kllZz+"</td> <td>"+temp.kdj+"</td> " +
-                          "<td>"+temp.kdjTq+"</td><td>"+temp.kdjZz+"</td> </tr>";
+                      var temp_tr = "<tr class='tbody_tr hz_tr'> <td>"+temp.shopName+"</td> <td>"+temp.xsje+"</td> <td>"+temp.xsjeTq+"</td> <td class='zz_td'>"+temp.xszz+"</td> <td>"+temp.jybs+"</td> " +
+                          " <td>"+temp.jybsTq+"</td> <td class='zz_td'>"+temp.jybsZz+"</td>  <td>"+temp.kll+"</td> <td>"+temp.kllTq+"</td> <td class='zz_td'>"+temp.kllZz+"</td> <td>"+temp.kdj+"</td> " +
+                          "<td>"+temp.kdjTq+"</td><td class='zz_td'>"+temp.kdjZz+"</td> </tr>";
                       $("#tbody_container").append(temp_tr);
                   }
 
               })
               $.each(data,function (index,temp) {
                   if(temp.shopName == '全比店'){
-                      var temp_tr = "<tr class='tbody_tr'> <td>"+temp.shopName+"</td> <td>"+temp.xsje+"</td> <td>"+temp.xsjeTq+"</td> <td>"+temp.xszz+"</td> <td>"+temp.jybs+"</td> " +
-                          " <td>"+temp.jybsTq+"</td> <td>"+temp.jybsZz+"</td>  <td>"+temp.kll+"</td> <td>"+temp.kllTq+"</td> <td>"+temp.kllZz+"</td> <td>"+temp.kdj+"</td> " +
-                          "<td>"+temp.kdjTq+"</td><td>"+temp.kdjZz+"</td> </tr>";
+                      var temp_tr = "<tr class='tbody_tr hz_tr'> <td>"+temp.shopName+"</td> <td>"+temp.xsje+"</td> <td>"+temp.xsjeTq+"</td> <td class='zz_td'>"+temp.xszz+"</td> <td>"+temp.jybs+"</td> " +
+                          " <td>"+temp.jybsTq+"</td> <td class='zz_td'>"+temp.jybsZz+"</td>  <td>"+temp.kll+"</td> <td>"+temp.kllTq+"</td> <td class='zz_td'>"+temp.kllZz+"</td> <td>"+temp.kdj+"</td> " +
+                          "<td>"+temp.kdjTq+"</td><td class='zz_td'>"+temp.kdjZz+"</td> </tr>";
                       $("#tbody_container").append(temp_tr);
                   }
 
               })
               $("#table_desc").html($("#startTime").val()+"-"+$("#endTime").val()+" 对比 "+$("#startTimedb").val()+"-"+$("#endTimedb").val());
+              $(".zz_td").each(function () {
+				  var temp = parseFloat($(this).text());
+				  if(temp < 0){
+				      $(this).addClass("zz_td_red");
+				  }
+              });
               $("#zzc").hide();
           });
 	  }
@@ -472,10 +495,11 @@
                      });
 				 }
                  freshPage(shopId.substr(1),$("#startTime").val(),$("#endTime").val(),$("#startTimedb").val(),$("#endTimedb").val());
+
              });
 
              $("#export_btn").on('click',function () {
-                 window.location.href="/export";
+                 window.location.href="/exportClientTable";
              });
 
              $("#export_echart").on('click',function () {

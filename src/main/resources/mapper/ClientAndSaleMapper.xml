@@ -12,7 +12,7 @@
        from ZH_MD_TBZS where rq between to_date('${startTime}','yyyymmdd') and to_date('${endTime}','yyyymmdd') group by shopId,shopName) a
        ON lp.shopid = a.shopid LEFT JOIN (select shopId,sum(xsje) as xsje,sum(xsbs) as xsbs,sum(kll) as kll,
        round(decode(sum(xsbs),0,0,sum(xsje)*10000/sum(xsbs)),2) as kdj from ZH_MD_TBZS where rq between to_date('${startTimedb}','yyyymmdd')
-       and to_date('${endTimedb}','yyyymmdd') group by shopId) b ON a.shopId = b.shopId  Where lp.bj_bd = 0 and lp.xs_bj = 1
+       and to_date('${endTimedb}','yyyymmdd') group by shopId) b ON a.shopId = b.shopId  Where lp.bj_bd = 0
 
         <if test=" shopId != '' and shopId != null " >
             AND  lp.shopid IN (${shopId})
@@ -36,7 +36,7 @@
          group by shopId, shopName) a ON lp.shopid = a.shopid LEFT JOIN (select shopId, sum(xsje) as xsje, sum(xsbs) as xsbs, sum(kll) as kll,
          round(decode(sum(xsbs), 0, 0, sum(xsje) * 10000 / sum(xsbs)), 2) as kdj from ZH_MD_TBZS where rq between
          to_date('${startTimedb}', 'yyyymmdd') and to_date('${endTimedb}', 'yyyymmdd') group by shopId) b ON a.shopId = b.shopId Where lp.bj_bd = 0
-         and lp.xs_bj = 1
+
         <if test=" shopId != '' and shopId != null " >
             AND  lp.shopid IN (${shopId})
         </if>

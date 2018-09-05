@@ -5,7 +5,9 @@ import com.bbg.pojo.*;
 import com.bbg.tools.ExcelUtil;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
-import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.hssf.usermodel.*;
+import org.apache.poi.hssf.util.HSSFColor;
+import org.apache.poi.ss.util.CellRangeAddress;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -18,10 +20,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created by H1N1 on 2018/8/24.
@@ -60,6 +61,19 @@ public class SaleAndClientAction {
         return "indexTable";
     }
 
+    @RequestMapping("/selectSaleAndClientTableTwo")
+    public String selectSaleAndClientTableTwo(ModelMap map){
+
+        //获取省区列表
+        List<String> sqList = clientAndSaleMapper.selectSqList();
+        map.addAttribute("sqList",sqList);
+
+        //获取所有门店
+        List<ShopInfo> shops = clientAndSaleMapper.selectAllShop();
+        map.addAttribute("page_shops",shops);
+        return "indexTableTwo";
+    }
+
     @RequestMapping("/selectSaleAndClientEchart")
     public String selectSaleAndClientEchart(ModelMap map){
 
@@ -73,20 +87,15 @@ public class SaleAndClientAction {
         return "indexEchart";
     }
 
-    @ResponseBody
-    @RequestMapping("/ajaxSelectSaleAndClientIndexTbale")
-    public ResponseObj ajaxSelectSaleAndClientIndexTbale(HttpServletRequest request,SaleAndClientRequireParam param){
+    public List<IndexTable> getIndexTableList(SaleAndClientRequireParam param){
         String shops_gc_kb = "";
         String shops_gc = "";
         String shops_bh_kb = "";
         String shops_bh = "";
+        String shops_sh_kb = "";
+        String shops_sh = "";
         String shops_kb = "";
         String shops_qb = "";
-
-        ResponseObj responseObj = new ResponseObj();
-        responseObj.setStatus("200");
-        responseObj.setObj("SUCCESS");
-        request.getSession().setAttribute("paramIndexTbale",param);
         List<IndexTable> saleAndClient =  clientAndSaleMapper.selectIndexTable(param);
         for(int i=0;i<saleAndClient.size();i++){
             IndexTable temp = saleAndClient.get(i);
@@ -106,6 +115,15 @@ public class SaleAndClientAction {
                     shops_kb  += ","+temp.getShopId();
                 }
             }
+
+            if(temp.getShopYt().equals("生活广场")){
+                shops_sh += ","+temp.getShopId();
+                if(temp.getKbType().equals("1")){
+                    shops_sh_kb += ","+temp.getShopId();
+                    shops_kb  += ","+temp.getShopId();
+                }
+            }
+
         }
         //shops_gc_kb 广场可比店
         if(!StringUtils.isEmpty(shops_gc_kb)){
@@ -138,6 +156,21 @@ public class SaleAndClientAction {
             indexTable_shops_bh.setShopName("百货业态合计");
             saleAndClient.add(indexTable_shops_bh);
         }
+        //shops_sh_kb shops_sh  生活广场合计
+        //shops_sh_kb 生活广场可比店
+        if(!StringUtils.isEmpty(shops_sh_kb)){
+            param.setShopId(shops_sh_kb.substring(1));
+            IndexTable indexTable_shops_sh_kb= clientAndSaleMapper.selectIndexTableByShopId(param);
+            indexTable_shops_sh_kb.setShopName("生活可比店");
+            saleAndClient.add(indexTable_shops_sh_kb);
+        }
+          //shops_sh 生活广场业态合计
+        if(!StringUtils.isEmpty(shops_sh)) {
+            param.setShopId(shops_sh.substring(1));
+            IndexTable indexTable_shops_sh = clientAndSaleMapper.selectIndexTableByShopId(param);
+            indexTable_shops_sh.setShopName("生活广场合计");
+            saleAndClient.add(indexTable_shops_sh);
+        }
         //shops_kb 可比店
         if(!StringUtils.isEmpty(shops_kb)) {
             param.setShopId(shops_kb.substring(1));
@@ -152,7 +185,280 @@ public class SaleAndClientAction {
             indexTable_shops_qb.setShopName("全比店");
             saleAndClient.add(indexTable_shops_qb);
         }
-        responseObj.setObj(saleAndClient);
+        return saleAndClient;
+    }
+
+    public List<String> getSquTime(String startTime,String endTime)  {
+        List<String> time = new ArrayList<>();
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
+        try {
+            Date startTime_date = sdf.parse(startTime);
+            Date endTime_date = sdf.parse(endTime);
+            Calendar tempStart = Calendar.getInstance();
+            tempStart.setTime(startTime_date);
+            while (startTime_date.getTime() <= endTime_date.getTime()) {
+                time.add(sdf.format(startTime_date));
+                tempStart.add(Calendar.DAY_OF_YEAR, 1);
+                startTime_date = tempStart.getTime();
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return time;
+    }
+
+    public List<TransTime> getSquTimeWeek(String startTime,String endTime)  {
+        List<TransTime> valueList = null;
+        List<String> time = new ArrayList<>();
+        List<String> time_res = new ArrayList<>();
+        Date time_temp = null;
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
+        SimpleDateFormat sdf_year = new SimpleDateFormat("yyyy");
+        Map<String,TransTime> timeRes = new LinkedHashMap<>();
+
+        try {
+            time = getSquTime(startTime,endTime);
+            for(int i=0;i<time.size();i++){
+                time_temp = sdf.parse(time.get(i));
+                Calendar tempStart = Calendar.getInstance();
+                tempStart.setFirstDayOfWeek(Calendar.MONDAY);
+                tempStart.setTime(time_temp);
+                String temp_key =sdf_year.format(time_temp)+"年第"+tempStart.get(Calendar.WEEK_OF_YEAR)+"周";
+                if(timeRes.containsKey(temp_key)){
+                    timeRes.get(temp_key).setEndTime(time.get(i));
+                }else{
+                    timeRes.put(temp_key,new TransTime(temp_key,time.get(i),time.get(i)));
+                }
+            }
+            Collection<TransTime> valueCollection = timeRes.values();
+            valueList = new ArrayList<TransTime>(valueCollection);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return valueList;
+    }
+
+    public List<TransTime> getSquTimeMonth(String startTime,String endTime)  {
+        List<TransTime> valueList = null;
+        List<String> time = new ArrayList<>();
+        List<String> time_res = new ArrayList<>();
+        Date time_temp = null;
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
+        SimpleDateFormat sdf_year = new SimpleDateFormat("yyyy");
+        Map<String,TransTime> timeRes = new LinkedHashMap<>();
+        try {
+            time = getSquTime(startTime,endTime);
+            for(int i=0;i<time.size();i++){
+                time_temp = sdf.parse(time.get(i));
+                Calendar tempStart = Calendar.getInstance();
+                tempStart.setFirstDayOfWeek(Calendar.MONDAY);
+                tempStart.setTime(time_temp);
+                String temp_key =sdf_year.format(time_temp)+"年"+(tempStart.get(Calendar.MONTH)+1)+"月";
+                if(timeRes.containsKey(temp_key)){
+                    timeRes.get(temp_key).setEndTime(time.get(i));
+                }else{
+                    timeRes.put(temp_key,new TransTime(temp_key,time.get(i),time.get(i)));
+                }
+            }
+            Collection<TransTime> valueCollection = timeRes.values();
+            valueList = new ArrayList<TransTime>(valueCollection);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return valueList;
+    }
+
+    public String transfromTimeToSea(String time){
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
+        String res = "";
+        try {
+            Date time_temp = sdf.parse(time);
+            Calendar tempStart = Calendar.getInstance();
+            tempStart.setFirstDayOfWeek(Calendar.MONDAY);
+            tempStart.setTime(time_temp);
+            int  month = tempStart.get(Calendar.MONTH)+1;
+            if(month>=1 && month<=3){
+                res = "1";
+            }
+            if(month>=4 && month<=6){
+                res = "2";
+            }
+            if(month>=7 && month<=9){
+                res = "3";
+            }if(month>=10 && month<=12){
+                res = "4";
+            }
+
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return res;
+    }
+
+    public List<TransTime> getSquTimeSea(String startTime,String endTime)  {
+        List<TransTime> valueList = null;
+        List<String> time = new ArrayList<>();
+        List<String> time_res = new ArrayList<>();
+        Date time_temp = null;
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
+        SimpleDateFormat sdf_year = new SimpleDateFormat("yyyy");
+        Map<String,TransTime> timeRes = new LinkedHashMap<>();
+        try {
+            time = getSquTime(startTime,endTime);
+            for(int i=0;i<time.size();i++){
+                time_temp = sdf.parse(time.get(i));
+                String temp_key =sdf_year.format(time_temp)+"年第"+(transfromTimeToSea(time.get(i)))+"季度";
+                if(timeRes.containsKey(temp_key)){
+                    timeRes.get(temp_key).setEndTime(time.get(i));
+                }else{
+                    timeRes.put(temp_key,new TransTime(temp_key,time.get(i),time.get(i)));
+                }
+            }
+            Collection<TransTime> valueCollection = timeRes.values();
+            valueList = new ArrayList<TransTime>(valueCollection);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return valueList;
+    }
+
+
+    public List<SaleAndClientRequireParam> geneateSaleAndClientRequireParam(SaleAndClientRequireParam param){
+        List<SaleAndClientRequireParam> res = new ArrayList<>();
+        List<String> time = null;
+        List<String> timedb = null;
+        if(param.getTimeType().equals("yyyy-mm-dd")){
+            time = getSquTime(param.getStartTime(),param.getEndTime());
+            timedb = getSquTime(param.getStartTimedb(),param.getEndTimedb());
+            int num = time.size();
+            if(time.size() > timedb.size()){
+                num = timedb.size();
+            }
+            for(int i=0;i<num;i++){
+                SaleAndClientRequireParam temp_param = new SaleAndClientRequireParam();
+                temp_param = param.clone();
+                String title = time.get(i) + "对比" + timedb.get(i);
+                temp_param.setStartTime(time.get(i));
+                temp_param.setEndTime(time.get(i));
+                temp_param.setStartTimedb(timedb.get(i));
+                temp_param.setEndTimedb(timedb.get(i));
+                temp_param.setDescTxt(title);
+                res.add(temp_param);
+            }
+        }
+
+        if(param.getTimeType().equals("yyyy-WW")){
+
+            List<TransTime> time_ww =  getSquTimeWeek(param.getStartTime(),param.getEndTime());
+            List<TransTime> timedb_ww =  getSquTimeWeek(param.getStartTimedb(),param.getEndTimedb());
+            int num = time_ww.size();
+            if(time_ww.size() > timedb_ww.size()){
+                num = timedb_ww.size();
+            }
+            for(int i=0;i<num;i++){
+                SaleAndClientRequireParam temp_param = new SaleAndClientRequireParam();
+                temp_param = param.clone();
+
+                temp_param.setStartTime(time_ww.get(i).getStartTime());
+                temp_param.setEndTime(time_ww.get(i).getEndTime());
+                temp_param.setStartTimedb(timedb_ww.get(i).getStartTime());
+                temp_param.setEndTimedb(timedb_ww.get(i).getEndTime());
+                String title = time_ww.get(i).getTitle()+"("+temp_param.getStartTime()+"-"+temp_param.getEndTime()+")"+ "对比"
+                        + timedb_ww.get(i).getTitle()+"("+temp_param.getStartTimedb()+"-"+temp_param.getEndTimedb()+")";
+                temp_param.setDescTxt(title);
+                res.add(temp_param);
+            }
+
+        }
+        if(param.getTimeType().equals("yyyy-mm")){
+
+            List<TransTime> time_ww =  getSquTimeMonth(param.getStartTime(),param.getEndTime());
+            List<TransTime> timedb_ww =  getSquTimeMonth(param.getStartTimedb(),param.getEndTimedb());
+            int num = time_ww.size();
+            if(time_ww.size() > timedb_ww.size()){
+                num = timedb_ww.size();
+            }
+            for(int i=0;i<num;i++){
+                SaleAndClientRequireParam temp_param = new SaleAndClientRequireParam();
+                temp_param = param.clone();
+
+                temp_param.setStartTime(time_ww.get(i).getStartTime());
+                temp_param.setEndTime(time_ww.get(i).getEndTime());
+                temp_param.setStartTimedb(timedb_ww.get(i).getStartTime());
+                temp_param.setEndTimedb(timedb_ww.get(i).getEndTime());
+                String title = time_ww.get(i).getTitle()+"("+temp_param.getStartTime()+"-"+temp_param.getEndTime()+")"+ "对比"
+                        + timedb_ww.get(i).getTitle()+"("+temp_param.getStartTimedb()+"-"+temp_param.getEndTimedb()+")";
+                temp_param.setDescTxt(title);
+                res.add(temp_param);
+            }
+
+        }
+
+        if(param.getTimeType().equals("yyyy-q")){
+
+            List<TransTime> time_ww =  getSquTimeSea(param.getStartTime(),param.getEndTime());
+            List<TransTime> timedb_ww =  getSquTimeSea(param.getStartTimedb(),param.getEndTimedb());
+            int num = time_ww.size();
+            if(time_ww.size() > timedb_ww.size()){
+                num = timedb_ww.size();
+            }
+            for(int i=0;i<num;i++){
+                SaleAndClientRequireParam temp_param = new SaleAndClientRequireParam();
+                temp_param = param.clone();
+
+                temp_param.setStartTime(time_ww.get(i).getStartTime());
+                temp_param.setEndTime(time_ww.get(i).getEndTime());
+                temp_param.setStartTimedb(timedb_ww.get(i).getStartTime());
+                temp_param.setEndTimedb(timedb_ww.get(i).getEndTime());
+                String title = time_ww.get(i).getTitle()+"("+temp_param.getStartTime()+"-"+temp_param.getEndTime()+")"+ "对比"
+                        + timedb_ww.get(i).getTitle()+"("+temp_param.getStartTimedb()+"-"+temp_param.getEndTimedb()+")";
+                temp_param.setDescTxt(title);
+                res.add(temp_param);
+            }
+
+        }
+
+
+        return res;
+    }
+    @ResponseBody
+    @RequestMapping("/ajaxSelectSaleAndClientIndexTbale")
+
+    public ResponseObj ajaxSelectSaleAndClientIndexTbale(HttpServletRequest request,SaleAndClientRequireParam param){
+        ResponseObj responseObj = new ResponseObj();
+        responseObj.setStatus("200");
+        responseObj.setObj("SUCCESS");
+        request.getSession().setAttribute("paramIndexTbale",param);
+        responseObj.setObj(getIndexTableList(param));
+        return responseObj;
+    }
+
+    @ResponseBody
+    @RequestMapping("/ajaxSelectSaleAndClientIndexTbaleTwo")
+    public ResponseObj ajaxSelectSaleAndClientIndexTbaleTwo(HttpServletRequest request,SaleAndClientRequireParam param){
+        ResponseObj responseObj = new ResponseObj();
+        List<ClientTableDTO> res = new ArrayList<>();
+        responseObj.setStatus("200");
+        responseObj.setObj("SUCCESS");
+        ClientTableDTO clientTableDTO = new ClientTableDTO();
+        param.setDescTxt(param.getStartTime()+"-"+param.getEndTime() + " 对比 "+param.getStartTimedb()+"-"+param.getEndTimedb());
+        //区间汇总
+        clientTableDTO.setTitle(param.getDescTxt());
+        clientTableDTO.setRes(getIndexTableList(param));
+        res.add(clientTableDTO);
+        //分段汇总
+        List<SaleAndClientRequireParam> saleAndClientRequireParams = geneateSaleAndClientRequireParam(param);
+        for(int i=0;i<saleAndClientRequireParams.size();i++){
+            SaleAndClientRequireParam temp_param = saleAndClientRequireParams.get(i);
+            ClientTableDTO clientTableDTO_temp = new ClientTableDTO();
+            clientTableDTO_temp.setTitle(temp_param.getDescTxt());
+            clientTableDTO_temp.setRes(getIndexTableList(temp_param));
+            res.add(clientTableDTO_temp);
+        }
+
+        //封装处理结果
+        responseObj.setObj(res);
+
         return responseObj;
     }
 
@@ -171,6 +477,8 @@ public class SaleAndClientAction {
 
         return responseObj;
     }
+
+
 
     @ResponseBody
     @RequestMapping("/ajaxSelectSaleAndClientParse")
@@ -280,6 +588,84 @@ public class SaleAndClientAction {
 
     }
 
+    /*@RequestMapping(value = "/exportClientTable")
+    @ResponseBody
+    public void exportClientTable(HttpServletRequest request, HttpServletResponse response){
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
+        HSSFWorkbook wb = new HSSFWorkbook();
+        String fileName = "客流销售分析"+sdf.format(new Date())+".xls";
+        String sheetName = "客流销售";
+        HSSFSheet sheet = wb.createSheet(sheetName);
+
+        // 第三步，在sheet中添加表头第0行,注意老版本poi对Excel的行数列数有限制
+        HSSFRow row = sheet.createRow(0);
+
+        // 第四步，创建单元格，并设置值表头 设置表头居中
+        HSSFCellStyle style = wb.createCellStyle();
+        style.setAlignment(HSSFCellStyle.ALIGN_CENTER); // 创建一个居中格式
+        style.setFillBackgroundColor(HSSFColor.BLUE_GREY.index);
+        //声明列对象
+        HSSFCell cell = null;
+         cell = row.createCell(0);
+        cell.setCellValue("门店");
+        cell.setCellStyle(style);
+
+        cell = row.createCell(1);
+        cell.setCellValue("20180901-20180902 对比 20170901-20170902");
+        cell.setCellStyle(style);
+        sheet.addMergedRegion(new CellRangeAddress(0,0,1,5));
+
+        try {
+            this.setResponseHeader(response, fileName);
+            OutputStream os = response.getOutputStream();
+            wb.write(os);
+            os.flush();
+            os.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+    }*/
+    @RequestMapping(value = "/exportClientTable")
+    @ResponseBody
+    public void exportClientTable(HttpServletRequest request, HttpServletResponse response){
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
+        SaleAndClientRequireParam param = (SaleAndClientRequireParam) request.getSession().getAttribute("paramIndexTbale");
+       // List<SaleAndClient> saleAndClient =  clientAndSaleMapper.selectSaleAndClient(param);
+        List<IndexTable> saleAndClient = getIndexTableList(param);
+        String[] title = {"门店ID","本期","同期","增长","本期","同期","增长","本期","同期","增长","本期","同期","增长",};
+        String fileName = "客流销售分析"+sdf.format(new Date())+".xls";
+        String sheetName = "客流销售";
+        String[][] content = new String[saleAndClient.size()][];
+        for (int i = 0; i < saleAndClient.size(); i++) {
+            content[i] = new String[title.length];
+            IndexTable obj = saleAndClient.get(i);
+            content[i][0] = obj.getShopName();
+            content[i][1] = obj.getXsje()+"";
+            content[i][2] = obj.getXsjeTq()+"";
+            content[i][3] = obj.getXszz()+"";
+            content[i][4] = obj.getJybs()+"";
+            content[i][5] = obj.getJybsTq()+"";
+            content[i][6] = obj.getJybsZz()+"";
+            content[i][7] = obj.getKll()+"";
+            content[i][8] = obj.getKllTq()+"";
+            content[i][9] = obj.getKllZz()+"";
+            content[i][10] = obj.getKdj()+"";
+            content[i][11] = obj.getKdjTq()+"";
+            content[i][12] = obj.getKdjZz()+"";
+        }
+
+        HSSFWorkbook wb = ExcelUtil.getHSSFWorkbook(sheetName, title, content, null);
+        try {
+            this.setResponseHeader(response, fileName);
+            OutputStream os = response.getOutputStream();
+            wb.write(os);
+            os.flush();
+            os.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
     //发送响应流方法
     public void setResponseHeader(HttpServletResponse response, String fileName) {
         try {

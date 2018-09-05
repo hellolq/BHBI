@@ -30,6 +30,17 @@ public class IndexTable {
     private double kdjTq;//客单价同期
     private String kdjZz;//客单价增长
 
+    //描述
+    private String descTxt;//描述
+
+    public String getDescTxt() {
+        return descTxt;
+    }
+
+    public void setDescTxt(String descTxt) {
+        this.descTxt = descTxt;
+    }
+
     public String getShopId() {
         return shopId;
     }
