@@ -709,17 +709,11 @@ public class SaleAndClientAction {
         return resWb;
     }
 
-    @RequestMapping(value = "/exportClientTable")
-    @ResponseBody
-    public void exportClientTable(HttpServletRequest request, HttpServletResponse response){
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
-        String fileName = "客流销售分析"+sdf.format(new Date())+".xls";
-       // SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
-        SaleAndClientRequireParam param = (SaleAndClientRequireParam) request.getSession().getAttribute("paramIndexTbale");
-       // List<SaleAndClient> saleAndClient =  clientAndSaleMapper.selectSaleAndClient(param);
-       /* List<IndexTable> saleAndClient = getIndexTableList(param);
+    public HSSFWorkbook getHSSFWorkbookByParamTwo(ClientTableDTO clientTableDTO,HSSFWorkbook wb,String fileName){
+
+        List<IndexTable> saleAndClient = transfromToIndexList(clientTableDTO.getRes());
         String[] title = {"","本期","同期","增长","本期","同期","增长","本期","同期","增长","本期","同期","增长"};
-        String fileName = "客流销售分析"+sdf.format(new Date())+".xls";
+
         String sheetName = "客流销售";
         String[][] content = new String[saleAndClient.size()][];
         for (int i = 0; i < saleAndClient.size(); i++) {
@@ -740,9 +734,18 @@ public class SaleAndClientAction {
             content[i][12] = obj.getKdjZz()+"";
         }
 
-        HSSFWorkbook wb = ExcelUtil.getHSSFWorkbookAuto(sheetName, title, content, null,0);*/
-       // System.out.println("_-------------------------"+wb.getSheetAt(0).getLastRowNum());
+        HSSFWorkbook resWb = ExcelUtil.getHSSFWorkbookAutoTwo(sheetName, title, content, wb,clientTableDTO.getTitle());
+        return resWb;
+    }
 
+
+    //发送响应流方法
+    @RequestMapping(value = "/exportClientTable")
+    @ResponseBody
+    public void exportClientTable(HttpServletRequest request, HttpServletResponse response){
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
+        String fileName = "客流销售分析"+sdf.format(new Date())+".xls";
+        SaleAndClientRequireParam param = (SaleAndClientRequireParam) request.getSession().getAttribute("paramIndexTbale");
         List<ClientTableDTO> res = new ArrayList<>();
         ClientTableDTO clientTableDTO = new ClientTableDTO();
         param.setDescTxt(param.getStartTime()+"-"+param.getEndTime() + " 对比 "+param.getStartTimedb()+"-"+param.getEndTimedb());
@@ -762,6 +765,7 @@ public class SaleAndClientAction {
         HSSFWorkbook wb = null;
         for(int i=0;i<res.size();i++){
             wb = getHSSFWorkbookByParam(res.get(i),wb,fileName);
+
         }
 
         try {
@@ -774,7 +778,45 @@ public class SaleAndClientAction {
             e.printStackTrace();
         }
     }
-    //发送响应流方法
+
+    @RequestMapping(value = "/exportClientTableTwo")
+    @ResponseBody
+    public void exportClientTableTwo(HttpServletRequest request, HttpServletResponse response){
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
+        String fileName = "客流销售分析"+sdf.format(new Date())+".xls";
+        SaleAndClientRequireParam param = (SaleAndClientRequireParam) request.getSession().getAttribute("paramIndexTbale");
+        List<ClientTableDTO> res = new ArrayList<>();
+        ClientTableDTO clientTableDTO = new ClientTableDTO();
+        param.setDescTxt(param.getStartTime()+"-"+param.getEndTime() + " 对比 "+param.getStartTimedb()+"-"+param.getEndTimedb());
+        //区间汇总
+        clientTableDTO.setTitle(param.getDescTxt());
+        clientTableDTO.setRes(getIndexTableList(param));
+        res.add(clientTableDTO);
+        //分段汇总
+        List<SaleAndClientRequireParam> saleAndClientRequireParams = geneateSaleAndClientRequireParam(param);
+        for(int i=0;i<saleAndClientRequireParams.size();i++){
+            SaleAndClientRequireParam temp_param = saleAndClientRequireParams.get(i);
+            ClientTableDTO clientTableDTO_temp = new ClientTableDTO();
+            clientTableDTO_temp.setTitle(temp_param.getDescTxt());
+            clientTableDTO_temp.setRes(getIndexTableList(temp_param));
+            res.add(clientTableDTO_temp);
+        }
+        HSSFWorkbook wb = null;
+        for(int i=0;i<res.size();i++){
+            wb = getHSSFWorkbookByParamTwo(res.get(i),wb,fileName);
+        }
+
+        try {
+            this.setResponseHeader(response, fileName);
+            OutputStream os = response.getOutputStream();
+            wb.write(os);
+            os.flush();
+            os.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     public void setResponseHeader(HttpServletResponse response, String fileName) {
         try {
             try {
