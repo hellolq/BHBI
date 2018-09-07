@@ -67,17 +67,23 @@
 			-moz-border-radius: 100px;
 			background: #fff url(/page/BHBI/images/loaderc.gif) no-repeat center center;
 		}
-
-		.thead_tr >th ,.thead_tr_two  >th {
+		.thead_tr{
 			background-color: #366091;
+		}
+		.thead_tr >th ,.thead_tr_two  >th {
+
 			color: white;
 			border: 1px solid #A5A5A5 !important;
 			text-align: center;
 			vertical-align: middle !important;
 			padding: 0px!important;
 		}
-		.thead_tr_two  >th {
+		.thead_tr_two {
 			background-color: #1258af;
+		}
+		.thead_tr_two  >th {
+/*			background-color: #1258af;*/
+			-webkit-transform:scale(0.833);
 		}
 		.tbody_tr>td{
 			text-align: center;
@@ -85,6 +91,7 @@
 			border: 1px solid black !important;
 			white-space: normal;
 			padding: 2px!important;
+			-webkit-transform:scale(0.833);
 		}
 		.hz_tr {
 			background-color: #FDD5B5;
@@ -98,7 +105,9 @@
 		body{
 			font-size: 8px;
 		}
-
+		.table>tbody>tr>td, .table>tbody>tr>th, .table>tfoot>tr>td, .table>tfoot>tr>th, .table>thead>tr>td, .table>thead>tr>th{
+			line-height: 1;
+		}
 
 	</style>
 
@@ -116,9 +125,13 @@
 		<div class="container" id="container">
 			<!-- 标题 -->
 			<div class="row">
-				<div class="col-md-12">
+				<div class="col-md-8">
 					<h1>门店客流、租赁销售</h1>
 				</div>
+				<div class="col-md-4" style="margin-top: 10px;">
+					<a href="/selectSaleAndClient"><h3>GMV销售报表</h3></a>
+				</div>
+
 			</div>
 
 			<!--
@@ -136,25 +149,33 @@
 					</div>
 				</div>
 
-				<div class="row sx_tj_row">
+				<div class="row sx_tj_row" th:if="${sqList != null}">
 					<div class="col-xs-1 sx_tj_sq_head">省区</div>
 					<div class="col-xs-11 sx_tj_sq_body  " id="shop_sq">
 						<button th:each="temp,tempSta:${sqList}" class="btn btn-default shop_sq shop_list" th:text="${temp}" ></button>
 					</div>
 				</div>
-				<div class="row sx_tj_row">
+				<div class="row sx_tj_row" th:if="${sqList == null}">
+					<div class="col-xs-1 sx_tj_sq_head">省区</div>
+					<div class="col-xs-11 sx_tj_sq_body  " id="shop_sq" th:utext="${preParam.sq}"></div>
+				</div>
+				<div class="row sx_tj_row" th:if="${sqList != null}">
 					<div class="col-xs-1 sx_tj_sq_head">业态</div>
-					<div class="col-xs-11 sx_tj_sq_body" id="shop_yt">
+					<div class="col-xs-11 sx_tj_sq_body" id="shop_yt" >
 						<button class="btn btn-default shop_list" type="submit">广场</button>
 						<button class="btn btn-default shop_list" type="submit">百货</button>
 						<button class="btn btn-default shop_list" type="submit">生活广场</button>
 					</div>
 				</div>
+				<div class="row sx_tj_row" th:if="${sqList == null}">
+					<div class="col-xs-1 sx_tj_sq_head">业态</div>
+					<div class="col-xs-11 sx_tj_sq_body" id="shop_yt" th:utext="${preParam.yt}"></div>
+				</div>
 
-				<div class="row sx_tj_row">
+				<div class="row sx_tj_row" th:if="${sqList != null}" >
 					<div class="col-xs-1 sx_tj_sq_head">时段</div>
 					<div class="col-xs-3">
-						<input id="startTime" size="16" type="text"   class="form_datetime">
+						<input id="startTime" size="16" type="text"   class="form_datetime" value="0">
 					</div>
 					<div class="col-xs-1" style="line-height: 26px;">至</div>
 					<div class="col-xs-3 ">
@@ -163,7 +184,18 @@
 
 				</div>
 
-				<div class="row sx_tj_row dbsd_div"  >
+				<div class="row sx_tj_row" th:if="${sqList == null}" >
+					<div class="col-xs-1 sx_tj_sq_head">时段</div>
+					<div class="col-xs-3">
+						<input id="startTime" size="16" type="text"   class="form_datetime" th:value="${preParam.startTime}">
+					</div>
+					<div class="col-xs-1" style="line-height: 26px;">至</div>
+					<div class="col-xs-3 ">
+						<input id="endTime" size="16" type="text"   class="form_datetime" th:value="${preParam.endTime}">
+					</div>
+				</div>
+
+				<div class="row sx_tj_row dbsd_div"  th:if="${sqList != null}">
 					<div class="col-xs-1 sx_tj_sq_head">对比时段</div>
 					<div class="col-xs-3">
 						<input id="startTimedb" size="16" type="text"   class="form_datetime">
@@ -173,14 +205,22 @@
 					<div class="col-xs-3 ">
 						<input id="endTimedb" size="16" type="text"   class="form_datetime">
 					</div>
+				</div>
+				<div class="row sx_tj_row dbsd_div"  th:if="${sqList == null}">
+					<div class="col-xs-1 sx_tj_sq_head">对比时段</div>
+					<div class="col-xs-3">
+						<input id="startTimedb" size="16" type="text"   class="form_datetime" th:value="${preParam.startTimedb}">
+					</div>
 
-
-
+					<div class="col-xs-1" style="line-height: 26px;">至</div>
+					<div class="col-xs-3 ">
+						<input id="endTimedb" size="16" type="text"   class="form_datetime" th:value="${preParam.endTimedb}">
+					</div>
 				</div>
 
 
 
-				<div class="row sx_tj_row">
+				<div class="row sx_tj_row" th:if="${sqList != null}">
 					<div class="col-xs-1 sx_tj_sq_head">周期</div>
 					<div class="col-xs-11 sx_tj_sq_body" id="shop_zq">
 						<button class="btn btn-default shop_list_zq active" type="submit" data="yyyy-mm-dd">日</button>
@@ -190,8 +230,13 @@
 					</div>
 				</div>
 
+				<div class="row sx_tj_row" th:if="${sqList == null}">
+					<div class="col-xs-1 sx_tj_sq_head">周期</div>
+					<div class="col-xs-11 sx_tj_sq_body" id="shop_zq" th:utext="${preParam.zq}"></div>
+				</div>
 
-				<div class="row sx_tj_row">
+
+				<div class="row sx_tj_row" th:if="${sqList != null}">
 					<div class="col-xs-1 sx_tj_sq_head">门店</div>
 					<div class="col-xs-11 sx_tj_sq_body" id="show_shop_div">
 						<button th:each="temp,tempSta:${page_shops}" class="btn btn-default shop_item" type="submit"
@@ -199,10 +244,20 @@
 					</div>
 				</div>
 
+				<div class="row sx_tj_row" th:if="${sqList == null}">
+					<div class="col-xs-1 sx_tj_sq_head">门店</div>
+					<div class="col-xs-11 sx_tj_sq_body" id="show_shop_div" th:utext="${preParam.btns}" >
+
+					</div>
+				</div>
+
 				<div class="row select_btn">
 					<button type="button" class="btn btn-info" id="select_btn">查询</button>
+
 					<button type="button" class="btn btn-primary" id="export_btn">导出</button>
+					<!--<button type="button" class="btn btn-primary" id="export_btn_two">导出(竖排)</button>-->
 					<button type="button" class="btn btn-success" id="export_echart">图表分析</button>
+					<!--<button type="button" class="btn btn-danger" id="select_base">基础数据</button>-->
 				</div>
 
 			</article>
@@ -254,6 +309,12 @@
 
 			</article>
 		</div>
+
+	<form style="display: none;" id="form_id" action="/selectSaleAndClientEchart" method="post">
+		<input name="sq" id="sq_form"><input name="yt" id="yt_form"><input name="zq" id="zq_form"><input name="startTime" id="startTime_form">
+		<input name="endTime" id="endTime_form"><input name="startTimedb" id="startTimedb_form"><input name="endTimedb" id="endTimedb_form">
+		<input name="btns" id="btns_form">
+	</form>
 
 	</body>
 	<script src="https://cdn.bootcss.com/jquery/1.12.4/jquery.min.js"></script>
@@ -634,10 +695,13 @@
         }
 
 		 $(function(){
-		     $("#startTime").val(formatDate(now_time).substr(0,6)+'01');
-             $("#endTime").val(formatDate(new Date(now_time - 24*60*60*1000)));
-             $("#startTimedb").val(formatDate(new Date(now_time  - 365 * 24 * 3600 * 1000)).substr(0,6)+'01');
-             $("#endTimedb").val(formatDate(new Date(now_time - 366 * 24 * 3600 * 1000)));
+		     if($("#startTime").val() == 0){
+                 $("#startTime").val(formatDate(now_time).substr(0,6)+'01');
+                 $("#endTime").val(formatDate(new Date(now_time - 24*60*60*1000)));
+                 $("#startTimedb").val(formatDate(new Date(now_time  - 365 * 24 * 3600 * 1000)).substr(0,6)+'01');
+                 $("#endTimedb").val(formatDate(new Date(now_time - 366 * 24 * 3600 * 1000)));
+			 }
+
 
              $("#shop_zq button").on('click',function () {
 				 $(".shop_list_zq").removeClass("active");
@@ -687,9 +751,38 @@
              $("#export_btn").on('click',function () {
                  window.location.href="/exportClientTableTwo";
              });
+             $("#export_btn_two").on('click',function () {
+                 window.location.href="/exportClientTable";
+             });
+            /* $("#select_base").on('click',function () {
+                 window.location.href="/selectSaleAndClient";
+             });*/
+            /* $("#export_echart").on('click',function () {
+                 var sq = $("#shop_sq").html();
+                 var yt =  $("#shop_yt").html();
+                 var zq = $("#shop_zq").html();
+                 var startTime = $("#startTime").val();
+                 var endTime = $("#endTime").val();
+                 var startTimedb = $("#startTimedb").val();
+                 var endTimedb = $("#endTimedb").val();
+                 var btns = $("#show_shop_div").html();
+
+                 window.location.href="/selectSaleAndClientEchart?sq="+sq+"&yt="+yt+"&zq="+zq
+					 +"&startTime="+startTime+"&endTime="+endTime+"&startTimedb="+startTimedb+"&endTimedb="+endTimedb
+				     +"&btns="+btns;
+             });*/
 
              $("#export_echart").on('click',function () {
-                 window.location.href="/selectSaleAndClientEchart";
+                 $("#sq_form").val($("#shop_sq").html().trim());
+                 $("#zq_form").val($("#shop_zq").html().trim());
+                 $("#yt_form").val($("#shop_yt").html().trim());
+                 $("#startTime_form").val($("#startTime").val());
+                 $("#endTime_form").val($("#endTime").val());
+                 $("#startTimedb_form").val($("#startTimedb").val());
+                 $("#endTimedb_form").val($("#endTimedb").val());
+                 $("#btns_form").val($("#show_shop_div").html().trim());
+                 $("#form_id").submit();
+                // window.location.href="/selectSaleAndClientEchart";
              });
 
 

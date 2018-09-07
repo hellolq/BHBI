@@ -10,6 +10,8 @@
 		<link href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
 		<link th:href="@{/page/BHBI/css/index.css}" rel="stylesheet">
 		<link rel="stylesheet" th:href="@{/page/BHBI/css/bootstrap-datetimepicker.min.css}" />
+
+		<link rel="stylesheet" th:href="@{/page/BHBI/css/bootstrap-multiselect.css}"  type="text/css"/>
 	</head>
 	<style>
 		.sx_tj_row {
@@ -19,7 +21,9 @@
 		.select_btn {
 			text-align: right;
 		}
-
+.table{
+	font-size: 12px;
+}
 		b{
 			font-weight: normal;
 		}
@@ -83,8 +87,11 @@
 		<div class="container" id="container">
 			<!-- 标题 -->
 			<div class="row">
-				<div class="col-md-12">
+				<div class="col-md-8">
 					<h1>门店客流、租赁销售</h1>
+				</div>
+				<div class="col-md-4" style="margin-top: 10px;">
+					<a href="/selectSaleAndClientTableTwo"><h3>客流销售报表</h3></a>
 				</div>
 			</div>
 
@@ -181,6 +188,23 @@
 					<button type="button" class="btn btn-info" id="select_btn">查询</button>
 					<button type="button" class="btn btn-primary" id="export_btn">导出</button>
 					<button type="button" class="btn btn-success" id="export_echart">图表分析</button>
+					<select id="example-getting-started" multiple="multiple" value="字段显示">
+						<option value="xs_opt" >销售</option>
+						<option value="qnxs_opt">去年销售</option>
+						<option value="tbxs_opt">同比销售</option>
+						<option value="jybs_opt">交易笔数</option>
+						<option value="qnjybs_opt">去年交易笔数</option>
+						<option value="tbjybs_opt">同比交易笔数</option>
+						<option value="tbxszz_opt">同比销售增长</option>
+						<option value="mll_opt">毛利率</option>
+						<option value="dc_opt">达成</option>
+						<option value="hyxs_opt">会员销售</option>
+						<option value="kll_opt">客流</option>
+						<option value="qnkll_opt">去年客流</option>
+						<option value="tbkll_opt">同比客流</option>
+						<option value="zhxs_opt">租户销售</option>
+					</select>
+					<!--<button type="button" class="btn btn-danger" id="select_excel">excel报表</button>-->
 				</div>
 
 			</article>
@@ -197,14 +221,20 @@
 									<th>门店名称</th>
 									<th>业态</th>
 									<th>省区</th>
-									<th>销售(万元)</th>
-									<th>交易笔数</th>
-									<th>同比销售增长</th>
-									<th>毛利率</th>
-									<th class="dc_table">达成</th>
-									<th>会员销售(万元)</th>
-									<th>客流</th>
-									<th>租户销售(万元)</th>
+									<th class="xs_opt">销售(万元)</th>
+									<th class="hz_mon_sea qnxs_opt">去年销售(万元)</th>
+									<th class="hz_mon_sea tbxs_opt">同比销售(万元)</th>
+									<th class="jybs_opt">交易笔数</th>
+									<th class="hz_mon_sea qnjybs_opt">去年交易笔数</th>
+									<th class="hz_mon_sea tbjybs_opt">同比交易笔数</th>
+									<th class="tbxszz_opt">同比销售增长</th>
+									<th class="mll_opt">毛利率</th>
+									<th class="dc_opt">达成</th>
+									<th class="hyxs_opt">会员销售(万元)</th>
+									<th class="kll_opt">客流</th>
+									<th class="hz_mon_sea qnkll_opt">去年客流</th>
+									<th class="hz_mon_sea tbkll_opt">同比客流</th>
+									<th class="zhxs_opt">租户销售(万元)</th>
 									<th class="rq_table">日期</th>
 								</tr>
 							</thead>
@@ -238,6 +268,8 @@
 	<script src="https://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 	<script type="text/javascript" th:src="@{/page/BHBI/js/bootstrap-datetimepicker.min.js}"></script>
 	<script type="text/javascript" th:src="@{/page/BHBI/js/bootstrap-datetimepicker.zh-CN.js}" ></script>
+	<script type="text/javascript" th:src="@{/page/BHBI/js/bootstrap-multiselect.js}" ></script>
+
 	<script th:inline="javascript">
         var page_shops = [[${page_shops}]];
         var now_time = new Date();
@@ -257,9 +289,16 @@
                 var page_data =  obj.navigatepageNums;
                 for(var i=0;i<data.length;i++){
                     var shop_body_tr = "<tr><td>"+(i+obj.startRow)+"</td> <td>"+data[i].shopId+"</td> <td>"+data[i].shopName+"</td><td>"
-						+data[i].yt+"</td><td>"+data[i].sq+"</td> <td>"+data[i].xsje+"</td><td>"+data[i].xsbs+"</td> <td>"
-                        +data[i].xsjekbRate+"</td><td>"+data[i].mll+"</td> <td class='dc_table'>"+data[i].dcRate
-						+ "</td> <td>"+data[i].hyxs+"</td> <td>"+data[i].kll+"</td> <td>"+data[i].gmv+"</td> <td class='rq_table'>"+data[i].zfrq+"</td> </tr>";
+						+data[i].yt+"</td><td>"+data[i].sq+"</td> <td class='xs_opt'>"+data[i].xsje+"</td><td class='hz_mon_sea qnxs_opt'>"
+						+data[i].xsjeQn+"</td><td class='hz_mon_sea tbxs_opt'>"+data[i].xsjeTb+"</td><td class='jybs_opt'>"+data[i].xsbs
+						+"</td><td class='hz_mon_sea qnjybs_opt'>"
+						+data[i].xsbsQn+"</td><td class='hz_mon_sea tbjybs_opt'>"+data[i].xsbsTb+"</td> <td class='tbxszz_opt'>"
+                        +data[i].xsjekbRate+"</td><td class='mll_opt'>"+data[i].mll+"</td> <td class='dc_table dc_opt'>"+data[i].dcRate
+						+ "</td> <td class='hyxs_opt'>"+data[i].hyxs+"</td> <td class='kll_opt'>"+data[i].kll
+						+"</td><td class='hz_mon_sea qnkll_opt'>"+data[i].kllQn
+						+"</td><td class='hz_mon_sea tbkll_opt'>"+data[i].kllTb+"</td> <td class='zhxs_opt'>"+data[i].gmv
+						+"</td> <td class='rq_table'>"+data[i].zfrq
+						+"</td> </tr>";
                     $("#shop_body").append(shop_body_tr);
                 }
                 $("#mes_pageNum").text(obj.pageNum);
@@ -267,8 +306,10 @@
                 $("#mes_total").text(obj.total);
                 if(timeType == 'yyyy-mm-dd' || timeType == 'yyyy-WW'){
                     $(".dc_table").hide();
+                    $(".hz_mon_sea").hide();
 				}else{
                     $(".dc_table").show();
+                    $(".hz_mon_sea").show();
 				}
                 var page_ul = $("<ul class='pagination'></ul>");
                 var page_first = "<li pn='1' ><a href='#'>首页</a></li>";
@@ -293,12 +334,16 @@
                 }
                 page_ul.append(page_last);
                 $("#page_nav").append(page_ul);
+
                 if( $("#hzqj_flag").is(':checked')){
                     $(".rq_table").hide();
 				}else{
                     $(".rq_table").show();
 				}
+                whenMonAndSea();
+                showKj();//sds
                 $("#zzc").hide();
+
             });
         }
 
@@ -366,12 +411,61 @@
             return year + '' + p(month) + "" + p(date);
         }
 
+        function setOptionTrue(sceneIdArr){
+            $('#example-getting-started option').each(function(i,content){
+                if($.inArray($.trim(content.value),sceneIdArr)>=0){
+                    this.selected=true;
+                }
+            });
+            $("#example-getting-started").multiselect('refresh');
+		}
+
+		function whenMonAndSea(){
+            var sceneIdArr = ['qnxs_opt','tbxs_opt','qnjybs_opt','tbjybs_opt','qnkll_opt','tbkll_opt','dc_opt'];
+            var res_tem = $($(".shop_list_zq.active")[0]).attr("data");
+            if($("#hzqj_flag").is(':checked')  && (res_tem == 'yyyy-mm' || res_tem == 'yyyy-q') ){
+                $('#example-getting-started option').each(function(i,content){
+                    if($.inArray($.trim(content.value),sceneIdArr)>=0){
+                        $(this).removeAttr('disabled');
+                    }
+                });
+			}else{
+                $('#example-getting-started option').each(function(i,content){
+                    if($.inArray($.trim(content.value),sceneIdArr)>=0){
+                        $(this).attr('disabled','disabled');
+                    }
+                });
+			}
+
+            $("#example-getting-started").multiselect('refresh');
+		}
+
+		function  showKj() {
+           $("#example-getting-started option").each(function(){
+                var class_opt = "."+$(this).val();
+               if($(this).is(':checked')){
+                   $(class_opt).show();
+			   }else{
+                   $(class_opt).hide();
+			   }
+            });
+        }
+
 		 $(function(){
 		     $("#startTime").val(formatDate(now_time).substr(0,6)+'01');
              $("#endTime").val(formatDate(new Date(now_time - 24*60*60*1000)));
              $("#startTimedb").val(formatDate(new Date(now_time  - 365 * 24 * 3600 * 1000)).substr(0,6)+'01');
              $("#endTimedb").val(formatDate(new Date(now_time - 366 * 24 * 3600 * 1000)));
              getNewPage(1,pnSize,"",$("#startTime").val(),$("#endTime").val(),$($(".shop_list_zq.active")[0]).attr("data"));
+             $("#example-getting-started").on('change',function () {
+                 showKj();
+             });
+             $('#example-getting-started').multiselect({
+				 nSelectedText :'字段选择'
+             });
+
+              var sceneIdArr = ['xs_opt','jybs_opt','mll_opt','tbxszz_opt','hyxs_opt','kll_opt','zhxs_opt'];
+             setOptionTrue(sceneIdArr);
 
              $("#shop_zq button").on('click',function () {
 				 $(".shop_list_zq").removeClass("active");
@@ -440,7 +534,9 @@
              $("#export_echart").on('click',function () {
                  window.location.href="/selectSaleAndClientEchart";
              });
-
+             $("#select_excel").on('click',function () {
+                 window.location.href="/selectSaleAndClientTableTwo";
+             });
 
 
 		 });

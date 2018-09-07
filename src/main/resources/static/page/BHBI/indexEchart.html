@@ -106,44 +106,71 @@
 
 				<div class="row sx_tj_row">
 					<div class="col-xs-1 sx_tj_sq_head">省区</div>
-					<div class="col-xs-11 sx_tj_sq_body  " id="shop_sq">
+					<div class="col-xs-11 sx_tj_sq_body  " id="shop_sq" th:if="${sqList == null}" th:utext="${preParam.sq}">
+					</div>
+					<div class="col-xs-11 sx_tj_sq_body  " id="shop_sq" th:if="${sqList != null}" >
 						<button th:each="temp,tempSta:${sqList}" class="btn btn-default shop_sq shop_list" th:text="${temp}" ></button>
 					</div>
 				</div>
 				<div class="row sx_tj_row">
 					<div class="col-xs-1 sx_tj_sq_head">业态</div>
-					<div class="col-xs-11 sx_tj_sq_body" id="shop_yt">
+					<div class="col-xs-11 sx_tj_sq_body" id="shop_yt" th:if="${sqList == null}" th:utext="${preParam.yt}">
+
+					</div>
+					<div class="col-xs-11 sx_tj_sq_body" id="shop_yt" th:if="${sqList != null}" >
 						<button class="btn btn-default shop_list" type="submit">广场</button>
 						<button class="btn btn-default shop_list" type="submit">百货</button>
 						<button class="btn btn-default shop_list" type="submit">生活广场</button>
 					</div>
 				</div>
 
-				<div class="row sx_tj_row">
+				<div class="row sx_tj_row" th:if="${sqList != null}">
 					<div class="col-xs-1 sx_tj_sq_head">时段</div>
 					<div class="col-xs-4">
-						<input id="startTime" size="16" type="text"   class="form_datetime">
+						<input id="startTime" size="16" type="text"   class="form_datetime" value="0">
 					</div>
 					<div class="col-xs-2" style="line-height: 26px;">至</div>
 					<div class="col-xs-4 ">
-						<input id="endTime" size="16" type="text"   class="form_datetime">
+						<input id="endTime" size="16" type="text"   class="form_datetime" value="0">
+					</div>
+				</div>
+
+				<div class="row sx_tj_row" th:if="${sqList == null}">
+					<div class="col-xs-1 sx_tj_sq_head">时段</div>
+					<div class="col-xs-4">
+						<input id="startTime" size="16" type="text"   class="form_datetime" th:value="${preParam.startTime}">
+					</div>
+					<div class="col-xs-2" style="line-height: 26px;">至</div>
+					<div class="col-xs-4 ">
+						<input id="endTime" size="16" type="text"   class="form_datetime" th:value="${preParam.endTime}">
 					</div>
 				</div>
 
 
 
-				<div class="row sx_tj_row">
+				<div class="row sx_tj_row" th:if="${sqList != null}">
 					<div class="col-xs-1 sx_tj_sq_head">对比时段</div>
 					<div class="col-xs-4">
-						<input id="startTimedb" size="16" type="text"   class="form_datetime">
+						<input id="startTimedb" size="16" type="text"   class="form_datetime" value="0">
 					</div>
 					<div class="col-xs-2" style="line-height: 26px;">至</div>
 					<div class="col-xs-4 ">
-						<input id="endTimedb" size="16" type="text"   class="form_datetime">
+						<input id="endTimedb" size="16" type="text"   class="form_datetime" value="0">
 					</div>
 				</div>
 
-				<div class="row sx_tj_row">
+				<div class="row sx_tj_row" th:if="${sqList == null}">
+					<div class="col-xs-1 sx_tj_sq_head">时段</div>
+					<div class="col-xs-4">
+						<input id="startTimedb" size="16" type="text"   class="form_datetime" th:value="${preParam.startTimedb}">
+					</div>
+					<div class="col-xs-2" style="line-height: 26px;">至</div>
+					<div class="col-xs-4 ">
+						<input id="endTimedb" size="16" type="text"   class="form_datetime" th:value="${preParam.endTimedb}">
+					</div>
+				</div>
+
+				<div class="row sx_tj_row" th:if="${sqList != null}">
 					<div class="col-xs-1 sx_tj_sq_head">周期</div>
 					<div class="col-xs-11 sx_tj_sq_body" id="shop_zq">
 						<button class="btn btn-default shop_list_zq active" type="submit" data="yyyy-mm-dd">日</button>
@@ -153,11 +180,24 @@
 					</div>
 				</div>
 
-				<div class="row sx_tj_row">
+				<div class="row sx_tj_row" th:if="${sqList == null}">
+					<div class="col-xs-1 sx_tj_sq_head">周期</div>
+					<div class="col-xs-11 sx_tj_sq_body" id="shop_zq" th:utext="${preParam.zq}">
+
+					</div>
+				</div>
+
+				<div class="row sx_tj_row" th:if="${sqList != null}">
 					<div class="col-xs-1 sx_tj_sq_head">门店</div>
 					<div class="col-xs-11 sx_tj_sq_body" id="show_shop_div">
 						<button th:each="temp,tempSta:${page_shops}" class="btn btn-default shop_item" type="submit"
 								 th:shopId="${temp.shopId}" th:text="${temp.shopName}"></button>
+					</div>
+				</div>
+				<div class="row sx_tj_row" th:if="${sqList == null}">
+					<div class="col-xs-1 sx_tj_sq_head">门店</div>
+					<div class="col-xs-11 sx_tj_sq_body" id="show_shop_div" th:utext="${preParam.btns}">
+
 					</div>
 				</div>
 
@@ -181,6 +221,12 @@
 				<div id="kll_echart" style="height: 560px;"></div>
 			</article>
 		</div>
+
+	<form style="display: none;" id="form_id" action="/selectSaleAndClientTableTwo" method="post">
+		<input name="sq" id="sq_form"><input name="yt" id="yt_form"><input name="zq" id="zq_form"><input name="startTime" id="startTime_form">
+		<input name="endTime" id="endTime_form"><input name="startTimedb" id="startTimedb_form"><input name="endTimedb" id="endTimedb_form">
+		<input name="btns" id="btns_form">
+	</form>
 
 	</body>
 	<script src="https://cdn.bootcss.com/jquery/1.12.4/jquery.min.js"></script>
@@ -240,10 +286,9 @@
                 legend: {
                     data:['销售-本期', '销售-对比','会员销售-本期', '会员销售-对比','客流-本期', '客流-对比','交易笔数-本期', '交易笔数-对比'],
                     selected:{
-                        '销售-对比' : false,
+
                         '会员销售-对比' : false,
-                        '客流-对比' : false,
-                        '交易笔数-对比' : false
+                        '会员销售-本期' : false
 					}
                 },
                 grid: {
@@ -402,10 +447,13 @@
 
 
 		 $(function(){
-		     $("#startTime").val(formatDate(now_time).substr(0,6)+'01');
-             $("#endTime").val(formatDate(new Date(now_time - 24*60*60*1000)));
-             $("#startTimedb").val(formatDate(new Date(now_time  - 365 * 24 * 3600 * 1000)).substr(0,6)+'01');
-             $("#endTimedb").val(formatDate(new Date(now_time - 366 * 24 * 3600 * 1000)));
+		     if($("#startTime").val() == 0){
+                 $("#startTime").val(formatDate(now_time).substr(0,6)+'01');
+                 $("#endTime").val(formatDate(new Date(now_time - 24*60*60*1000)));
+                 $("#startTimedb").val(formatDate(new Date(now_time  - 365 * 24 * 3600 * 1000)).substr(0,6)+'01');
+                 $("#endTimedb").val(formatDate(new Date(now_time - 366 * 24 * 3600 * 1000)));
+			 }
+
              getNewPage('',$("#startTime").val(),$("#endTime").val(),$("#startTimedb").val(),$("#endTimedb").val(),$($(".shop_list_zq.active")[0]).attr("data"));
              $("#show_shop_div").on('click','.shop_item',function () {
                  var className = $(this).attr("class");
@@ -452,7 +500,16 @@
              });
 
              $("#export_echart").on('click',function () {
-                 window.location.href="/selectSaleAndClient";
+                 $("#sq_form").val($("#shop_sq").html().trim());
+                 $("#zq_form").val($("#shop_zq").html().trim());
+                 $("#yt_form").val($("#shop_yt").html().trim());
+                 $("#startTime_form").val($("#startTime").val());
+                 $("#endTime_form").val($("#endTime").val());
+                 $("#startTimedb_form").val($("#startTimedb").val());
+                 $("#endTimedb_form").val($("#endTimedb").val());
+                 $("#btns_form").val($("#show_shop_div").html().trim());
+                 $("#form_id").submit();
+                // window.location.href="/selectSaleAndClientTwo";
              });
 
 		 });

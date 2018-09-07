@@ -1,15 +1,20 @@
 package com.bbg.tools;
 
+
 import org.apache.poi.hssf.usermodel.*;
 import org.apache.poi.hssf.util.HSSFColor;
+import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.util.CellRangeAddress;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created by H1N1 on 2018/8/27.
  */
 public class ExcelUtil {
 
-    public static void createRow(HSSFSheet sheet,int rowNum,int colNum,String[] col_arry,HSSFCellStyle style){
+    public static void createRow(HSSFSheet sheet, int rowNum, int colNum, String[] col_arry, HSSFCellStyle style){
         HSSFRow row = null;
         HSSFCell cell = null;
         row = sheet.createRow(rowNum);
@@ -34,7 +39,9 @@ public class ExcelUtil {
     public static void createRow_body(HSSFSheet sheet,int rowNum,int colNum,String[] col_arry,HSSFWorkbook wb){
         HSSFRow row = null;
         HSSFCell cell = null;
-        HSSFCellStyle style = wb.createCellStyle();
+        HSSFCellStyle style = null;
+         style = wb.createCellStyle();
+
         //内容字体样式
         style.setVerticalAlignment(HSSFCellStyle.VERTICAL_CENTER);//垂直
         style.setAlignment(HSSFCellStyle.ALIGN_CENTER);//水平
@@ -52,6 +59,7 @@ public class ExcelUtil {
             style.setFillPattern(HSSFCellStyle.SOLID_FOREGROUND);
             style.setFillForegroundColor(HSSFColor.BLUE_GREY.index);
         }
+
         for(int i=0;i<col_arry.length;i++){
             cell = row.createCell(i+colNum);
             cell.setCellValue(col_arry[i]);
@@ -62,27 +70,10 @@ public class ExcelUtil {
     public static void editRow_body(HSSFSheet sheet,int rowNum,int colNum,String[] col_arry,HSSFWorkbook wb){
         HSSFRow row = sheet.getRow(rowNum);
         HSSFCell cell = null;
-        HSSFCellStyle style = wb.createCellStyle();
-        //内容字体样式
-        style.setVerticalAlignment(HSSFCellStyle.VERTICAL_CENTER);//垂直
-        style.setAlignment(HSSFCellStyle.ALIGN_CENTER);//水平
-        //内容边框颜色
-        style.setBorderBottom(HSSFCellStyle.BORDER_THIN);
-        style.setBorderLeft(HSSFCellStyle.BORDER_THIN);
-        style.setBorderRight(HSSFCellStyle.BORDER_THIN);
-        style.setBorderTop(HSSFCellStyle.BORDER_THIN);
-
-        if(col_arry[0].equals("百货可比店") ||col_arry[0].equals("广场可比店") || col_arry[0].equals("可比店") || col_arry[0].equals("全比店")|| col_arry[0].equals("生活可比店") ){
-            style.setFillPattern(HSSFCellStyle.SOLID_FOREGROUND);
-            style.setFillForegroundColor(HSSFColor.ROSE.index);
-        }else if(col_arry[0].equals("百货业态合计") || col_arry[0].equals("生活广场合计") || col_arry[0].equals("广场业态合计")){
-            style.setFillPattern(HSSFCellStyle.SOLID_FOREGROUND);
-            style.setFillForegroundColor(HSSFColor.BLUE_GREY.index);
-        }
         for(int i=1;i<col_arry.length;i++){
             cell = row.createCell(i+colNum-1);
             cell.setCellValue(col_arry[i]);
-            cell.setCellStyle(style);
+            cell.setCellStyle(row.getCell(0).getCellStyle());
         }
     }
 
@@ -262,8 +253,8 @@ public class ExcelUtil {
             sheet.addMergedRegion(new CellRangeAddress(1,1,3+indexCol,5+indexCol));
             sheet.addMergedRegion(new CellRangeAddress(1,1,6+indexCol,8+indexCol));
             sheet.addMergedRegion(new CellRangeAddress(1,1,9+indexCol,11+indexCol));
-
-            editRow(sheet,2,0+indexCol-1,title,style_title);
+            String[] title_pre = {"本期","同期","增长","本期","同期","增长","本期","同期","增长","本期","同期","增长"};
+            editRow(sheet,2,0+indexCol,title_pre,style_title);
             for(int i=0;i<values.length;i++){
                 editRow_body(sheet,(i+3),0+indexCol,values[i], wb);
             }

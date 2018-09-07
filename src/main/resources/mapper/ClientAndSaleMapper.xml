@@ -49,6 +49,70 @@
 
     <select id="selectSaleAndClient"  resultType="com.bbg.pojo.SaleAndClient" parameterType="com.bbg.pojo.SaleAndClientRequireParam">
         <if test=' dbType == "1" ' >
+
+            select a.shopId,a.shopName,a.yt,a.sq,a.xsje,a.gmv,a.hyxs,a.kll,a.xsbs,a.mll,
+            TO_CHAR(ROUND(decode(b.xsjedb,0,0,(a.xsje-b.xsjedb)/b.xsjedb *100 ),2) , 'fm9999990.0999')|| '%'  as xsjekbRate
+            <if test="timeType == 'yyyy-mm' or timeType == 'yyyy-q' ">
+                , a.dcRate, b.xsjedb as xsjeTb,
+                b.xsbsdb as xsbsTb,
+                b.kll as kllTb,
+                c.xsjedb as xsjeQn,
+                c.xsbsdb as xsbsQn,
+                c.kll as kllQn
+            </if>
+            from
+            (SELECT b.shopid as shopId,b.shopname as shopName,b.bj_yt as yt,b.sq as sq,sum(a.xsje) as xsje,
+            round((nvl(sum(c.xsje),0)+nvl(sum(d.xsje),0)+nvl(sum(e.xsje),0)+ nvl(sum(f.xsje),0))/10000,2) as gmv,
+            sum(a.hyxs) as hyxs,sum(a.kll) as kll,sum(a.xsbs) as xsbs,
+            TO_CHAR(ROUND(decode(sum(a.xsje),0,0,sum(a.xsml)/ sum(a.xsje) *100 ),2) , 'fm9999990.0999')|| '%'  as mll
+
+            <if test="timeType == 'yyyy-mm' or timeType == 'yyyy-q' ">
+                , TO_CHAR(ROUND(decode(sum(xsjh),0,0,sum(a.xsje)/ sum(xsjh) *100 ),2), 'fm9999990.0999') || '%' as dcRate
+            </if>
+
+            FROM  ZH_MD_TBZS a LEFT JOIN lp_bi_shop b ON a.shopid = b.shopid
+
+            LEFT JOIN (select d.shopid,d.shopname,sum(a.xsje) as xsje,a.jzrq as rq from  THREE_SALE a,shopdef b,malldef c,lp_bi_shop d
+            where a.shopid = b.id and b.mallid = c.id and c.code = d.ebs_mcid
+            group by  d.shopid,d.shopname,a.jzrq ) c ON c.shopid = a.shopid and a.rq = c.rq
+
+            LEFT JOIN (select e.shopid,sum(a.xsje) as xsje,a.jzrq as rq from  SALE a,skt b,shopdef c,malldef d ,lp_bi_shop e
+            where a.sktno = b.sktno  and b.shopid = c.id and c.mallid = d.id and d.code = e.ebs_mcid
+            group by a.jzrq,e.shopid  ) d ON d.shopid = a.shopid and a.rq = d.rq
+
+            LEFT JOIN (select e.shopid,sum(a.xsje) as xsje,a.jzrq as rq from  his_sale a,skt b,shopdef c,malldef d ,lp_bi_shop e
+            where a.sktno = b.sktno  and b.shopid = c.id and c.mallid = d.id and d.code = e.ebs_mcid
+            group by a.jzrq,e.shopid  ) e ON e.shopid = a.shopid and a.rq = e.rq
+
+            LEFT JOIN ( select d.shopid,sum(a.amount) as xsje,a.rq  from INPUTSALE a,shopdef b,malldef c,lp_bi_shop d
+            where a.shopid = b.id and b.mallid = c.id and c.code = d.ebs_mcid and status = 1
+            group by d.shopid,a.rq  ) f ON f.shopid = a.shopid and a.rq = f.rq
+
+
+
+
+            WHERE 1=1
+            <if test=" shopId != '' and shopId != null " >
+                and a.shopId in (${shopId})
+            </if>
+
+            <if test=" startTime != '' and startTime != null " >
+                and a.rq between  to_date(#{startTime},'yyyymmdd') and to_date(#{endTime},'yyyymmdd')
+            </if>
+            group by b.shopid ,b.shopname,b.bj_yt,b.sq)a  left join (
+            SELECT sum(xsje) as xsjedb,sum(xsbs) as xsbsdb,sum(kll) as kll,  shopid FROM ZH_MD_TBZS where rq between to_date(#{startTimedb}, 'yyyymmdd')
+            and to_date(#{endTimedb}, 'yyyymmdd') group by shopid
+            ) b ON   a.shopid = b.shopid
+
+            <if test="timeType == 'yyyy-mm' or timeType == 'yyyy-q' ">
+                left join (SELECT sum(xsje) as xsjedb,sum(xsbs) as xsbsdb,sum(kll) as kll, shopid
+                FROM ZH_MD_TBZS
+                where rq between (to_date(#{startTime}, 'yyyymmdd')-365) and
+                (to_date(#{endTime}, 'yyyymmdd')-365)
+                group by shopid) c ON a.shopid = c.shopid
+            </if>
+        </if>
+        <!--<if test=' dbType == "1" ' >
             select a.shopId,a.shopName,a.yt,a.sq,a.xsje,a.gmv,a.hyxs,a.kll,a.xsbs,a.mll,
             TO_CHAR(ROUND(decode(b.xsjedb,0,0,(a.xsje-b.xsjedb)/b.xsjedb *100 ),2) , 'fm9999990.0999')|| '%'  as xsjekbRate
             <if test="timeType == 'yyyy-mm' or timeType == 'yyyy-q' ">
@@ -97,7 +161,7 @@
             SELECT sum(xsje) as xsjedb,  shopid FROM ZH_MD_TBZS where rq between to_date(#{startTimedb}, 'yyyymmdd')
             and to_date(#{endTimedb}, 'yyyymmdd') group by shopid
             ) b ON   a.shopid = b.shopid
-        </if>
+        </if>-->
 
         <if test=' dbType == "0" ' >
         SELECT b.shopid as shopId,b.shopname as shopName,b.bj_yt as yt,b.sq as sq,sum(a.xsje) as xsje,

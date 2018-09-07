@@ -10,14 +10,71 @@ public class SaleAndClient {
     private String yt;
     private String sq;
     private double xsje;
+    private double xsjeQn;
+    private double xsjeTb;
     private double hyxs;
     private int kll;
+    private int kllQn;
+    private int kllTb;
     private int xsbs;
+    private int xsbsQn;
+    private int xsbsTb;
     private String zfrq;
     private String xsjekbRate;//可比销售增长
     private String dcRate;//达成
     private String mll;//毛利率
     private double gmv;
+
+    private double hyxsQn;//会员销售-去年
+    private double hyxsTb;//会员销售-同比
+
+    public double getXsjeQn() {
+        return xsjeQn;
+    }
+
+    public void setXsjeQn(double xsjeQn) {
+        this.xsjeQn = xsjeQn;
+    }
+
+    public double getXsjeTb() {
+        return xsjeTb;
+    }
+
+    public void setXsjeTb(double xsjeTb) {
+        this.xsjeTb = xsjeTb;
+    }
+
+    public int getKllQn() {
+        return kllQn;
+    }
+
+    public void setKllQn(int kllQn) {
+        this.kllQn = kllQn;
+    }
+
+    public int getKllTb() {
+        return kllTb;
+    }
+
+    public void setKllTb(int kllTb) {
+        this.kllTb = kllTb;
+    }
+
+    public int getXsbsQn() {
+        return xsbsQn;
+    }
+
+    public void setXsbsQn(int xsbsQn) {
+        this.xsbsQn = xsbsQn;
+    }
+
+    public int getXsbsTb() {
+        return xsbsTb;
+    }
+
+    public void setXsbsTb(int xsbsTb) {
+        this.xsbsTb = xsbsTb;
+    }
 
     public String getXsjekbRate() {
         return xsjekbRate;
@@ -131,9 +188,15 @@ public class SaleAndClient {
                 ", yt='" + yt + '\'' +
                 ", sq='" + sq + '\'' +
                 ", xsje=" + xsje +
+                ", xsjeQn=" + xsjeQn +
+                ", xsjeTb=" + xsjeTb +
                 ", hyxs=" + hyxs +
                 ", kll=" + kll +
+                ", kllQn=" + kllQn +
+                ", kllTb=" + kllTb +
                 ", xsbs=" + xsbs +
+                ", xsbsQn=" + xsbsQn +
+                ", xsbsTb=" + xsbsTb +
                 ", zfrq='" + zfrq + '\'' +
                 ", xsjekbRate='" + xsjekbRate + '\'' +
                 ", dcRate='" + dcRate + '\'' +

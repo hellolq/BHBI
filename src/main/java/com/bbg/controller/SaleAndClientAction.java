@@ -62,12 +62,16 @@ public class SaleAndClientAction {
     }
 
     @RequestMapping("/selectSaleAndClientTableTwo")
-    public String selectSaleAndClientTableTwo(ModelMap map){
+    public String selectSaleAndClientTableTwo(ModelMap map,IndexWithConditionDTO param){
 
-        //获取省区列表
-        List<String> sqList = clientAndSaleMapper.selectSqList();
-        map.addAttribute("sqList",sqList);
+        if(param.getBtns() != null){
+            map.addAttribute("preParam",param);
+        }else{
+            //获取省区列表
+            List<String> sqList = clientAndSaleMapper.selectSqList();
+            map.addAttribute("sqList",sqList);
 
+        }
         //获取所有门店
         List<ShopInfo> shops = clientAndSaleMapper.selectAllShop();
         map.addAttribute("page_shops",shops);
@@ -75,12 +79,15 @@ public class SaleAndClientAction {
     }
 
     @RequestMapping("/selectSaleAndClientEchart")
-    public String selectSaleAndClientEchart(ModelMap map){
+    public String selectSaleAndClientEchart(ModelMap map,IndexWithConditionDTO param){
+       if(param.getBtns() != null){
+           map.addAttribute("preParam",param);
+       }else{
+           //获取省区列表
+           List<String> sqList = clientAndSaleMapper.selectSqList();
+           map.addAttribute("sqList",sqList);
 
-        //获取省区列表
-        List<String> sqList = clientAndSaleMapper.selectSqList();
-        map.addAttribute("sqList",sqList);
-
+       }
         //获取所有门店
         List<ShopInfo> shops = clientAndSaleMapper.selectAllShop();
         map.addAttribute("page_shops",shops);
@@ -765,7 +772,6 @@ public class SaleAndClientAction {
         HSSFWorkbook wb = null;
         for(int i=0;i<res.size();i++){
             wb = getHSSFWorkbookByParam(res.get(i),wb,fileName);
-
         }
 
         try {
