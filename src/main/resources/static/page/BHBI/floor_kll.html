@@ -1,0 +1,429 @@
+<!DOCTYPE html >
+<html xmlns:th="http://www.thymeleaf.org">
+
+	<head>
+		<meta charset="utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta name="renderer" content="webkit">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<title></title>
+		<link href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
+		<link th:href="@{/page/BHBI/css/index.css}" rel="stylesheet">
+		<link rel="stylesheet" th:href="@{/page/BHBI/css/bootstrap-datetimepicker.min.css}" />
+	</head>
+	<style>
+
+		th, td {
+			text-align: center;
+		}
+		.sx_tj_row {
+			height: 56px;
+		}
+		
+		.select_btn {
+			text-align: right;
+		}
+
+		b{
+			font-weight: normal;
+		}
+
+		.btn-default{
+			margin: 5px;
+		}
+		.form_datetime{
+			padding-left: 8px;
+		}
+		button.btn.btn-default.active {
+			background-color: #3879D9;
+			color: white;
+		}
+
+		.bbgMui-loading-mask {
+			position: fixed;
+			top: 0;
+			left: 0;
+			right: 0;
+			bottom: 0;
+			background-color: #000;
+			height: 100%;
+			opacity: 0.5;
+			filter: alpha(opacity =     50);
+		}
+
+		.bbgMui-loading-load {
+			position: fixed;
+			top: 50%;
+			left: 50%;
+			margin: -25px 0 0 -25px;
+			color: #fff;
+			font-family: '微软雅黑';
+		}
+
+		.bbgMui-loading-circle {
+			width: 42px;
+			height: 42px;
+			margin: 10px auto;
+			padding: 5px;
+			position: relative;
+			border-radius: 100px;
+			-webkit-border-radius: 100px;
+			-moz-border-radius: 100px;
+			background: #fff url(/page/BHBI/images/loaderc.gif) no-repeat center center;
+		}
+		.thead_tr{
+			background-color: #366091;
+		}
+		.thead_tr >th ,.thead_tr_two  >th {
+
+			color: white;
+			border: 1px solid #A5A5A5 !important;
+			text-align: center;
+			vertical-align: middle !important;
+			padding: 0px!important;
+		}
+		.thead_tr_two {
+			background-color: #1258af;
+		}
+		.thead_tr_two  >th {
+/*			background-color: #1258af;*/
+			-webkit-transform:scale(0.833);
+		}
+		.tbody_tr>td{
+			text-align: center;
+			vertical-align: middle !important;
+			border: 1px solid black !important;
+			white-space: normal;
+			padding: 2px!important;
+			-webkit-transform:scale(0.833);
+		}
+		.hz_tr {
+			background-color: #FDD5B5;
+		}
+		.yt_hj_tr{
+			background-color: #D9D9D9;
+		}
+		.zz_td_red{
+			color: red;
+		}
+		body{
+			font-size: 8px;
+		}
+		.table>tbody>tr>td, .table>tbody>tr>th, .table>tfoot>tr>td, .table>tfoot>tr>th, .table>thead>tr>td, .table>thead>tr>th{
+			line-height: 1;
+		}
+
+	</style>
+
+	<body>
+
+	<div id="zzc" class="bbgMui-loading-mask"
+		 style="z-index: 55555; display: none;">
+		<div class="bbgMui-loading-load">
+			<div class="bbgMui-loading-circle"></div>
+			Loading...
+		</div>
+	</div>
+
+		<!-- 搭建显示页面 -->
+		<div class="container" id="container">
+			<!-- 标题 -->
+			<div class="row">
+				<div class="col-md-8">
+					<h1>门店楼层客流查询</h1>
+				</div>
+				<div class="col-md-4" style="margin-top: 10px;display: flex;">
+					<a href="/selectSaleAndClientTableTwo" style="margin-left: 30px;"><h3 style="font-size: 18px;">客流销售查询</h3></a>
+				</div>
+
+			</div>
+
+			<!--
+            	作者：liqiaoyes@qq.com
+            	时间：2018-08-24
+            	描述：条件筛选
+            -->
+
+			<article class="sx_tj">
+
+				<div class="row sx_tj_row">
+					<div class="col-xs-1 sx_tj_sq_head">全司</div>
+					<div class="col-xs-11 sx_tj_sq_body">
+						<button  class="btn btn-default shop_all active shop_list" >全司</button>
+					</div>
+				</div>
+
+				<div class="row sx_tj_row" th:if="${sqList != null}">
+					<div class="col-xs-1 sx_tj_sq_head">省区</div>
+					<div class="col-xs-11 sx_tj_sq_body  " id="shop_sq">
+						<button th:each="temp,tempSta:${sqList}" class="btn btn-default shop_sq shop_list" th:text="${temp}" ></button>
+					</div>
+				</div>
+				<div class="row sx_tj_row" th:if="${sqList == null}">
+					<div class="col-xs-1 sx_tj_sq_head">省区</div>
+					<div class="col-xs-11 sx_tj_sq_body  " id="shop_sq" th:utext="${preParam.sq}"></div>
+				</div>
+				<div class="row sx_tj_row" th:if="${sqList != null}">
+					<div class="col-xs-1 sx_tj_sq_head">业态</div>
+					<div class="col-xs-11 sx_tj_sq_body" id="shop_yt" >
+						<button class="btn btn-default shop_list" type="submit">广场</button>
+						<button class="btn btn-default shop_list" type="submit">百货</button>
+						<button class="btn btn-default shop_list" type="submit">生活广场</button>
+					</div>
+				</div>
+				<div class="row sx_tj_row" th:if="${sqList == null}">
+					<div class="col-xs-1 sx_tj_sq_head">业态</div>
+					<div class="col-xs-11 sx_tj_sq_body" id="shop_yt" th:utext="${preParam.yt}"></div>
+				</div>
+
+				<div class="row sx_tj_row" th:if="${sqList != null}" >
+					<div class="col-xs-1 sx_tj_sq_head">时段</div>
+					<div class="col-xs-3">
+						<input id="startTime" size="16" type="text"   class="form_datetime" value="0">
+					</div>
+					<div class="col-xs-1" style="line-height: 26px;">至</div>
+					<div class="col-xs-3 ">
+						<input id="endTime" size="16" type="text"   class="form_datetime">
+					</div>
+
+				</div>
+
+				<div class="row sx_tj_row"  >
+					<div class="col-xs-1 sx_tj_sq_head">对比时段</div>
+					<div class="col-xs-3">
+						<input id="startTimedb" size="16" type="text"   class="form_datetime" >
+					</div>
+					<div class="col-xs-1" style="line-height: 26px;">至</div>
+					<div class="col-xs-3 ">
+						<input id="endTimedb" size="16" type="text"   class="form_datetime" >
+					</div>
+				</div>
+
+				<div class="row sx_tj_row" th:if="${sqList != null}">
+					<div class="col-xs-1 sx_tj_sq_head">门店</div>
+					<div class="col-xs-11 sx_tj_sq_body" id="show_shop_div">
+						<button th:each="temp,tempSta:${page_shops}" class="btn btn-default shop_item" type="submit"
+								 th:shopId="${temp.shopId}" th:text="${temp.shopName}"></button>
+					</div>
+				</div>
+
+				<div class="row sx_tj_row" th:if="${sqList == null}">
+					<div class="col-xs-1 sx_tj_sq_head">门店</div>
+					<div class="col-xs-11 sx_tj_sq_body" id="show_shop_div" th:utext="${preParam.btns}" >
+
+					</div>
+				</div>
+
+				<div class="row select_btn">
+					<button type="button" class="btn btn-info" id="select_btn">查询</button>
+					<button type="button" class="btn btn-primary" id="export_btn">导出</button>
+				</div>
+
+			</article>
+
+			<!-- 显示表格数据 -->
+			<article>
+				<div class="row">
+
+					<div style="width:85%;position:  absolute;">
+						<table class="table table-hover" id="emps_table">
+							<thead>
+							   <tr>
+								   <th>门店</th>
+								   <th>楼层</th>
+								   <th>点位ID</th>
+								   <th>点位名称</th>
+								   <th>进店人数</th>
+								   <th>同期</th>
+								   <th>增长</th>
+							   </tr>
+							</thead>
+
+							<tbody id="tbody_container">
+
+							</tbody>
+
+						</table>
+					</div>
+
+
+				</div>
+
+			</article>
+		</div>
+
+	<form style="display: none;" id="form_id" action="/selectSaleAndClientEchart" method="post">
+		<input name="sq" id="sq_form"><input name="yt" id="yt_form"><input name="zq" id="zq_form"><input name="startTime" id="startTime_form">
+		<input name="endTime" id="endTime_form"><input name="startTimedb" id="startTimedb_form"><input name="endTimedb" id="endTimedb_form">
+		<input name="btns" id="btns_form">
+	</form>
+
+	</body>
+	<script src="https://cdn.bootcss.com/jquery/1.12.4/jquery.min.js"></script>
+	<script src="https://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+	<script type="text/javascript" th:src="@{/page/BHBI/js/bootstrap-datetimepicker.min.js}"></script>
+	<script type="text/javascript" th:src="@{/page/BHBI/js/bootstrap-datetimepicker.zh-CN.js}" ></script>
+	<script th:inline="javascript">
+        var page_shops = [[${page_shops}]];
+        var now_time = new Date();
+        var pnSize = 10;
+        var dbType = 0;
+
+        function showShop() {
+            var sq_item = "";
+            var yt_item = "";
+            var show_shops = new Array();
+
+			//判断省区是否选中
+            $("#shop_sq button.active").each(function(){
+                sq_item = sq_item +","+ $(this).text();
+			});
+
+			//判断业态是否选中
+            $("#shop_yt button.active").each(function(){
+                yt_item = yt_item +","+ $(this).text();
+            });
+
+            $.each(page_shops,function(index,value){
+                if((sq_item == "" || sq_item.indexOf(value.sq) > -1 ) && (yt_item == "" ||  yt_item.indexOf(','+value.bjYt) > -1)){
+                    show_shops.push(value);
+                }
+            });
+
+            $("#show_shop_div").empty();
+			for(var i=0;i<show_shops.length;i++){
+			    var btn_temp = "<button class='btn btn-default shop_item' type='submit' " +
+					"                     shopid='"+show_shops[i].shopId+"'>"+show_shops[i].shopName+"</button>";
+                $("#show_shop_div").append(btn_temp);
+			}
+        }
+
+        function p(s) {
+            return s < 10 ? '0' + s : s;
+        }
+
+        function formatDate(myDate) {
+            var year = myDate.getFullYear();
+            var month = myDate.getMonth() + 1;
+            var date = myDate.getDate();
+            return year + '' + p(month) + "" + p(date);
+        }
+
+		 $(function(){
+		     if($("#startTime").val() == 0){
+                 $("#startTime").val(formatDate(now_time).substr(0,6)+'01');
+                 $("#endTime").val(formatDate(new Date(now_time - 24*60*60*1000)));
+                 $("#startTimedb").val(formatDate(new Date(now_time  - 365 * 24 * 3600 * 1000)).substr(0,6)+'01');
+                 $("#endTimedb").val(formatDate(new Date(now_time - 366 * 24 * 3600 * 1000)));
+			 }
+
+
+             $("#shop_zq button").on('click',function () {
+				 $(".shop_list_zq").removeClass("active");
+				 $(this).addClass("active");
+             });
+
+             $("#show_shop_div").on('click','.shop_item',function () {
+                 var className = $(this).attr("class");
+                 if(className.indexOf("active") > 0){
+                     $(this).removeClass("active");
+                 }else{
+                     $(this).addClass("active");
+                 }
+             });
+
+             $("#container").on('click','.shop_list',function () {
+				 var className = $(this).attr("class");
+				 if(className.indexOf("active") > 0){
+				     $(this).removeClass("active");
+				 }else{
+                     $(this).addClass("active");
+				 }
+                 showShop();
+             });
+
+             function ajaxGetFloorKll(shopId,startTime,endTime,startTimeCom,endTimeCom){
+                 $("#zzc").show();
+                 var deferred = $.Deferred();
+                 $.ajax({
+                     url:"/ajaxGetFloorClient",
+                     type:"post",
+                     data:{"shopId":shopId,"startTime":startTime,"endTime":endTime,
+                         "startTimeCom":startTimeCom,"endTimeCom":endTimeCom},
+                     dataType:"json",
+                     success:function(data){
+                         if(data.status == "200"){
+
+                             deferred.resolve(data.obj);
+                         }
+                     }
+                 });
+                 return deferred.promise();
+			 }
+
+             $("#select_btn").on('click',function () {
+                 var shopId = "";
+                 var shop_num_active = $("#show_shop_div button.active").length;
+                 var shop_num = $("#show_shop_div button").length;
+                 if(shop_num == 0){
+                     alert("请选择要查询的门店");
+                     return;
+				 }
+                 if(shop_num_active > 0){
+                     $("#show_shop_div button.active").each(function(){
+                         shopId = shopId+","+$(this).attr("shopId");
+                     });
+				 }else{
+                     $("#show_shop_div button").each(function(){
+                         shopId = shopId+","+$(this).attr("shopId");
+                     });
+				 }
+				 var startTime = $("#startTime").val();
+                 var endTime = $("#endTime").val();
+                 var startTimeCom = $("#startTimedb").val();
+                 var endTimeCom = $("#endTimedb").val();
+                 if(shopId != ""){
+                     var shopId_temp = shopId.substr(1);
+                     ajaxGetFloorKll(shopId_temp,startTime,endTime,startTimeCom,endTimeCom).done(function (data) {
+                         console.log(data)
+                         $("#zzc").hide();
+                         $("#tbody_container").empty();
+                         $.each(data,function(index,temp_obj){
+
+                             var tr_temp = "<tr> <td>"+temp_obj.shopName+"</td> <td>"+temp_obj.floorName+"</td> <td>"+temp_obj.doorId+"</td> " +
+								 "<td>"+temp_obj.doorName+"</td>" +
+								 " <td>"+temp_obj.incount+"</td> <td>"+temp_obj.incountCom+"</td> <td class='kll_growth'>"+temp_obj.growth+"</td> </tr>";
+                             $("#tbody_container").append(tr_temp);
+
+                         });
+
+                         $(".kll_growth").each(function(index,obj){
+                             var temp_val = parseFloat($(this).text());
+                             if(temp_val < 0){
+                                 $(this).css('color','red');
+							 }
+						 });
+
+                     });
+				 }else{
+                     alert("请选择门店");
+				 }
+
+
+             });
+
+             $("#export_btn").on('click',function () {
+                 window.location.href="/exportFloorKll";
+             });
+
+
+
+
+
+
+
+
+		 });
+	</script>
+
+</html>

@@ -197,14 +197,22 @@
 						<option value="tbjybs_opt">同比交易笔数</option>
 						<option value="tbxszz_opt">同比销售增长</option>
 						<option value="mll_opt">毛利率</option>
+						<option value="mllQn_opt">去年毛利率</option>
+						<option value="mllTb_opt">同比毛利率</option>
 						<option value="dc_opt">达成</option>
 						<option value="hyxs_opt">会员销售</option>
+						<option value="hyxsQn_opt">去年会员销售</option>
+						<option value="hyxsTb_opt">同比会员销售</option>
 						<option value="kll_opt">客流</option>
 						<option value="qnkll_opt">去年客流</option>
 						<option value="tbkll_opt">同比客流</option>
 						<option value="zhxs_opt">租户销售</option>
 					</select>
-					<!--<button type="button" class="btn btn-danger" id="select_excel">excel报表</button>-->
+					<!--<button type="button" class="btn btn-danger" id="select_excel">excel报表</button>
+					<th class="mllQn_opt">去年毛利率</th>
+									<th class="mllTb_opt">同比毛利率</th>
+
+					-->
 				</div>
 
 			</article>
@@ -223,14 +231,18 @@
 									<th>省区</th>
 									<th class="xs_opt">销售(万元)</th>
 									<th class="hz_mon_sea qnxs_opt">去年销售(万元)</th>
-									<th class="hz_mon_sea tbxs_opt">同比销售(万元)</th>
+									<th class="hz_mon_sea tbxs_opt">同比销售</th>
 									<th class="jybs_opt">交易笔数</th>
 									<th class="hz_mon_sea qnjybs_opt">去年交易笔数</th>
 									<th class="hz_mon_sea tbjybs_opt">同比交易笔数</th>
 									<th class="tbxszz_opt">同比销售增长</th>
 									<th class="mll_opt">毛利率</th>
+									<th class="mllQn_opt">去年毛利率</th>
+									<th class="mllTb_opt">同比毛利率</th>
 									<th class="dc_opt">达成</th>
 									<th class="hyxs_opt">会员销售(万元)</th>
+									<th class="hyxsQn_opt">去年会员销售(万元)</th>
+									<th class="hyxsTb_opt">同比会员销售</th>
 									<th class="kll_opt">客流</th>
 									<th class="hz_mon_sea qnkll_opt">去年客流</th>
 									<th class="hz_mon_sea tbkll_opt">同比客流</th>
@@ -293,8 +305,11 @@
 						+data[i].xsjeQn+"</td><td class='hz_mon_sea tbxs_opt'>"+data[i].xsjeTb+"</td><td class='jybs_opt'>"+data[i].xsbs
 						+"</td><td class='hz_mon_sea qnjybs_opt'>"
 						+data[i].xsbsQn+"</td><td class='hz_mon_sea tbjybs_opt'>"+data[i].xsbsTb+"</td> <td class='tbxszz_opt'>"
-                        +data[i].xsjekbRate+"</td><td class='mll_opt'>"+data[i].mll+"</td> <td class='dc_table dc_opt'>"+data[i].dcRate
-						+ "</td> <td class='hyxs_opt'>"+data[i].hyxs+"</td> <td class='kll_opt'>"+data[i].kll
+                        +data[i].xsjekbRate+"</td><td class='mll_opt'>"+data[i].mll+"</td><td class='mllQn_opt'>"+data[i].mllQn+"</td><td class='mllTb_opt'>"
+						+data[i].mllTb+"</td> <td class='dc_table dc_opt'>"+data[i].dcRate
+						+ "</td> <td class='hyxs_opt'>"+data[i].hyxs+"("+data[i].hyxszb+")</td><td class='hyxsQn_opt'>"
+						+ data[i].hyxsQn+"("+data[i].hyxszbQn+")</td><td class='hyxsTb_opt'>"+data[i].hyxsTb+"</td> <td class='kll_opt'>"
+						+data[i].kll
 						+"</td><td class='hz_mon_sea qnkll_opt'>"+data[i].kllQn
 						+"</td><td class='hz_mon_sea tbkll_opt'>"+data[i].kllTb+"</td> <td class='zhxs_opt'>"+data[i].gmv
 						+"</td> <td class='rq_table'>"+data[i].zfrq
@@ -421,9 +436,9 @@
 		}
 
 		function whenMonAndSea(){
-            var sceneIdArr = ['qnxs_opt','tbxs_opt','qnjybs_opt','tbjybs_opt','qnkll_opt','tbkll_opt','dc_opt'];
+            var sceneIdArr = ['qnxs_opt','tbxs_opt','qnjybs_opt','tbjybs_opt','qnkll_opt','tbkll_opt','dc_opt','hyxsQn_opt','hyxsTb_opt','mllQn_opt','mllTb_opt'];
             var res_tem = $($(".shop_list_zq.active")[0]).attr("data");
-            if($("#hzqj_flag").is(':checked')  && (res_tem == 'yyyy-mm' || res_tem == 'yyyy-q') ){
+            if($("#hzqj_flag").is(':checked')  ){
                 $('#example-getting-started option').each(function(i,content){
                     if($.inArray($.trim(content.value),sceneIdArr)>=0){
                         $(this).removeAttr('disabled');
@@ -463,7 +478,7 @@
              $('#example-getting-started').multiselect({
 				 nSelectedText :'字段选择'
              });
-
+             //设置默认选中
               var sceneIdArr = ['xs_opt','jybs_opt','mll_opt','tbxszz_opt','hyxs_opt','kll_opt','zhxs_opt'];
              setOptionTrue(sceneIdArr);
 

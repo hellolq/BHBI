@@ -1,18 +1,78 @@
 package com.bbg.tools;
 
 
+import com.bbg.pojo.FloorKllDTO;
 import org.apache.poi.hssf.usermodel.*;
 import org.apache.poi.hssf.util.HSSFColor;
+import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.util.CellRangeAddress;
+import org.apache.poi.xssf.streaming.SXSSFWorkbook;
+import org.apache.poi.xssf.usermodel.XSSFFont;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
+import javax.servlet.http.HttpServletResponse;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
  * Created by H1N1 on 2018/8/27.
  */
 public class ExcelUtil {
+    /*
+    * 生成行
+    * */
+    public static void  createRow( String[] head,int rowNum,Sheet sh){
+        Row row = sh.createRow(rowNum);
+        for(int cellNum=0;cellNum<head.length;cellNum++){
+            String tittle = head[cellNum];
+            Cell cell = row.createCell(cellNum);
+            cell.setCellValue(tittle);
+        }
+    }
+
+    /*
+    *  07 excel 无样式
+    * */
+    public static SXSSFWorkbook wb07(String fileName, String[] head,List<String[]> bodys ) throws IOException {
+        SXSSFWorkbook wb = new SXSSFWorkbook(-1);
+        Sheet sh = wb.createSheet();
+        //表头标题
+        int rowNum = 0;
+        createRow(head,rowNum,sh);
+        //表格内容
+        for(int i=0;i<bodys.size();i++){
+            String[] temp = bodys.get(i);
+            createRow(temp,i+1,sh);
+        }
+        return wb;
+    }
+
+
+
+
+    public static void setResponseHeader(HttpServletResponse response, String fileName) {
+        try {
+            try {
+                fileName = new String(fileName.getBytes(),"ISO8859-1");
+            } catch (UnsupportedEncodingException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+            response.setContentType("application/octet-stream;charset=ISO8859-1");
+            response.setHeader("Content-Disposition", "attachment;filename="+ fileName);
+            response.addHeader("Pargam", "no-cache");
+            response.addHeader("Cache-Control", "no-cache");
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+    }
 
     public static void createRow(HSSFSheet sheet, int rowNum, int colNum, String[] col_arry, HSSFCellStyle style){
         HSSFRow row = null;
@@ -262,6 +322,10 @@ public class ExcelUtil {
 
         return wb;
     }
+
+    /*
+    * 解决不能架子啊
+    * */
 
 
 
