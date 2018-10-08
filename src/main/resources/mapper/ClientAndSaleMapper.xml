@@ -5,14 +5,40 @@
     <select id="selectIndexTable"  resultType="com.bbg.pojo.IndexTable" parameterType="com.bbg.pojo.SaleAndClientRequireParam">
        select lp.shopId as shopId,lp.pc_shopname as shopName,lp.bj_yt as shopYt,decode(nvl(b.xsje,0),0,0,1) as kbType, a.xsje,b.xsje as xsjeTq ,
        TO_CHAR(ROUND(decode(b.xsje,0,0,(a.xsje-b.xsje)/b.xsje)*100,2), 'fm9999990.0999')|| '%' as xszz, a.xsbs as jybs,b.xsbs as jybsTq,
-       TO_CHAR(ROUND(decode(b.xsbs,0,0,(a.xsbs-b.xsbs)/b.xsbs)*100,2), 'fm9999990.0999')|| '%' as jybsZz , a.kll,b.kll as kllTq,
-       TO_CHAR(ROUND(decode(b.kll,0,0,(a.kll-b.kll)/b.kll)*100,2), 'fm9999990.0999')|| '%' as kllZz, a.kdj,b.kdj as kdjTq,
+       TO_CHAR(ROUND(decode(b.xsbs,0,0,(a.xsbs-b.xsbs)/b.xsbs)*100,2), 'fm9999990.0999')|| '%' as jybsZz , kll_now.kll,kll_old.kll as kllTq,
+       TO_CHAR(ROUND(decode(kll_old.kll,0,0,(kll_now.kll-kll_old.kll)/kll_old.kll)*100,2), 'fm9999990.0999')|| '%' as kllZz, a.kdj,b.kdj as kdjTq,
        TO_CHAR(ROUND(decode(b.kdj,0,0,(a.kdj-b.kdj)/b.kdj)*100,2), 'fm9999990.0999')|| '%' as kdjZz from lp_bi_shop lp left join (select shopId,
-       shopName,sum(xsje) as xsje,sum(xsbs) as xsbs,sum(kll) as kll,round(decode(sum(xsbs),0,0,sum(xsje)*10000/sum(xsbs)),2) as kdj
+       shopName,sum(xsje) as xsje,sum(xsbs) as xsbs,round(decode(sum(xsbs),0,0,sum(xsje)*10000/sum(xsbs)),2) as kdj
        from ZH_MD_TBZS where rq between to_date('${startTime}','yyyymmdd') and to_date('${endTime}','yyyymmdd') group by shopId,shopName) a
-       ON lp.shopid = a.shopid LEFT JOIN (select shopId,sum(xsje) as xsje,sum(xsbs) as xsbs,sum(kll) as kll,
+       ON lp.shopid = a.shopid LEFT JOIN (select shopId,sum(xsje) as xsje,sum(xsbs) as xsbs,
        round(decode(sum(xsbs),0,0,sum(xsje)*10000/sum(xsbs)),2) as kdj from ZH_MD_TBZS where rq between to_date('${startTimedb}','yyyymmdd')
-       and to_date('${endTimedb}','yyyymmdd') group by shopId) b ON a.shopId = b.shopId  Where lp.bj_bd = 0
+       and to_date('${endTimedb}','yyyymmdd') group by shopId) b ON a.shopId = b.shopId
+
+        LEFT JOIN
+
+        ( select b.shopId,sum(case a.starthr
+        when '09' then (a.incount * 0.5)
+        when '22' then (a.incount * 0.5)
+        else a.incount
+        end
+        ) as kll from kl_shop_hours a,lp_bi_shop b where areatypeid = 2 and a.shopid = b.kl_mcid
+        and a.mdate <![CDATA[  >= ]]> '${startTime}' and a.mdate <![CDATA[  <= ]]> '${endTime}'
+        and starthr <![CDATA[  >= ]]> 9 and starthr <![CDATA[ <=  ]]> 22
+        group by b.shopId ) kll_now ON a.shopId = kll_now.shopId
+
+        LEFT JOIN
+
+        ( select b.shopId,sum(case a.starthr
+        when '09' then (a.incount * 0.5)
+        when '22' then (a.incount * 0.5)
+        else a.incount
+        end
+        ) as kll from kl_shop_hours a,lp_bi_shop b where areatypeid = 2 and a.shopid = b.kl_mcid
+        and a.mdate <![CDATA[ >= ]]>  '${startTimedb}'  and  a.mdate <![CDATA[ <=  ]]> '${endTimedb}'
+        and starthr <![CDATA[ >= ]]>  9 and starthr <![CDATA[ <=  ]]> 22
+        group by b.shopId ) kll_old ON a.shopId = kll_old.shopId
+
+        Where lp.bj_bd = 0
 
         <if test=" shopId != '' and shopId != null " >
             AND  lp.shopid IN (${shopId})
@@ -30,17 +56,49 @@
          round(decode(sum(jybstq), 0, 0, sum(xsjetq) * 10000 / sum(jybstq)), 2) as kdjTq, TO_CHAR(ROUND(decode(round(decode(sum(jybstq), 0, 0,
          sum(xsjetq) * 10000 / sum(jybstq)), 2), 0, 0, (round(decode(sum(jybs), 0, 0, sum(xsje) * 10000 / sum(jybs)), 2) -
          round(decode(sum(jybstq), 0, 0, sum(xsjetq) * 10000 / sum(jybstq)), 2)) / round(decode(sum(jybstq), 0, 0,
-         sum(xsjetq) * 10000 / sum(jybstq)), 2)) * 100, 2), 'fm9999990.0999') || '%' as kdjZz from ( select lp.shopId as shopId,
-         lp.shopname as shopName, lp.bj_yt as shopYt, decode(nvl(b.xsje, 0), 0, 0, 1) as kbType, a.xsje, b.xsje as xsjeTq, a.xsbs as jybs,
-         b.xsbs as jybsTq, a.kll, b.kll as kllTq from lp_bi_shop lp left join (select shopId, shopName, sum(xsje) as xsje, sum(xsbs) as xsbs,
-         sum(kll) as kll from ZH_MD_TBZS where rq between to_date('${startTime}', 'yyyymmdd') and to_date('${endTime}', 'yyyymmdd')
-         group by shopId, shopName) a ON lp.shopid = a.shopid LEFT JOIN (select shopId, sum(xsje) as xsje, sum(xsbs) as xsbs, sum(kll) as kll,
-         round(decode(sum(xsbs), 0, 0, sum(xsje) * 10000 / sum(xsbs)), 2) as kdj from ZH_MD_TBZS where rq between
-         to_date('${startTimedb}', 'yyyymmdd') and to_date('${endTimedb}', 'yyyymmdd') group by shopId) b ON a.shopId = b.shopId Where lp.bj_bd = 0
+         sum(xsjetq) * 10000 / sum(jybstq)), 2)) * 100, 2), 'fm9999990.0999') || '%' as kdjZz from (
+
+        select lp.shopId as shopId,lp.pc_shopname as shopName,lp.bj_yt as shopYt,decode(nvl(b.xsje,0),0,0,1) as kbType, a.xsje,b.xsje as xsjeTq ,
+        TO_CHAR(ROUND(decode(b.xsje,0,0,(a.xsje-b.xsje)/b.xsje)*100,2), 'fm9999990.0999')|| '%' as xszz, a.xsbs as jybs,b.xsbs as jybsTq,
+        TO_CHAR(ROUND(decode(b.xsbs,0,0,(a.xsbs-b.xsbs)/b.xsbs)*100,2), 'fm9999990.0999')|| '%' as jybsZz , kll_now.kll,kll_old.kll as kllTq,
+        TO_CHAR(ROUND(decode(kll_old.kll,0,0,(kll_now.kll-kll_old.kll)/kll_old.kll)*100,2), 'fm9999990.0999')|| '%' as kllZz, a.kdj,b.kdj as kdjTq,
+        TO_CHAR(ROUND(decode(b.kdj,0,0,(a.kdj-b.kdj)/b.kdj)*100,2), 'fm9999990.0999')|| '%' as kdjZz from lp_bi_shop lp left join (select shopId,
+        shopName,sum(xsje) as xsje,sum(xsbs) as xsbs,round(decode(sum(xsbs),0,0,sum(xsje)*10000/sum(xsbs)),2) as kdj
+        from ZH_MD_TBZS where rq between to_date('${startTime}','yyyymmdd') and to_date('${endTime}','yyyymmdd') group by shopId,shopName) a
+        ON lp.shopid = a.shopid LEFT JOIN (select shopId,sum(xsje) as xsje,sum(xsbs) as xsbs,
+        round(decode(sum(xsbs),0,0,sum(xsje)*10000/sum(xsbs)),2) as kdj from ZH_MD_TBZS where rq between to_date('${startTimedb}','yyyymmdd')
+        and to_date('${endTimedb}','yyyymmdd') group by shopId) b ON a.shopId = b.shopId
+
+        LEFT JOIN
+
+        ( select b.shopId,sum(case a.starthr
+        when '09' then (a.incount * 0.5)
+        when '22' then (a.incount * 0.5)
+        else a.incount
+        end
+        ) as kll from kl_shop_hours a,lp_bi_shop b where areatypeid = 2 and a.shopid = b.kl_mcid
+        and a.mdate <![CDATA[  >= ]]> '${startTime}' and a.mdate <![CDATA[  <= ]]> '${endTime}'
+        and starthr <![CDATA[  >= ]]> 9 and starthr <![CDATA[ <=  ]]> 22
+        group by b.shopId ) kll_now ON a.shopId = kll_now.shopId
+
+        LEFT JOIN
+
+        ( select b.shopId,sum(case a.starthr
+        when '09' then (a.incount * 0.5)
+        when '22' then (a.incount * 0.5)
+        else a.incount
+        end
+        ) as kll from kl_shop_hours a,lp_bi_shop b where areatypeid = 2 and a.shopid = b.kl_mcid
+        and a.mdate <![CDATA[ >= ]]>  '${startTimedb}'  and  a.mdate <![CDATA[ <=  ]]> '${endTimedb}'
+        and starthr <![CDATA[ >= ]]>  9 and starthr <![CDATA[ <=  ]]> 22
+        group by b.shopId ) kll_old ON a.shopId = kll_old.shopId
+
+        Where lp.bj_bd = 0
 
         <if test=" shopId != '' and shopId != null " >
             AND  lp.shopid IN (${shopId})
         </if>
+        order by a.xsje desc
 
          )
     </select>

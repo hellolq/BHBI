@@ -751,7 +751,7 @@ public class SaleAndClientAction {
  }
     }
 
-    public List<IndexTable> transfromToIndexList(List<IndexTable> saleAndClient){
+    public static List<IndexTable> transfromToIndexList(List<IndexTable> saleAndClient){
         List<IndexTable> res = new ArrayList<>();
         for(int i=0;i<saleAndClient.size();i++) {
             IndexTable temp = saleAndClient.get(i);
@@ -1030,7 +1030,6 @@ public class SaleAndClientAction {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
         String fileName = sdf.format(new Date())+".xlsx";
         SaleAndClientRequireParam param = (SaleAndClientRequireParam) request.getSession().getAttribute("paramIndexTbale");
-
         ClientTableDTO clientTableDTO = new ClientTableDTO();
         param.setDescTxt(param.getStartTime()+"-"+param.getEndTime() + " 对比 "+param.getStartTimedb()+"-"+param.getEndTimedb());
         //区间汇总
@@ -1038,7 +1037,17 @@ public class SaleAndClientAction {
         clientTableDTO.setRes(getIndexTableList(param));
 
         SXSSFWorkbook wb = null;
-        wb = getExcel_07(clientTableDTO,wb,fileName);
+        wb = getExcel_07(clientTableDTO,wb);
+        //分段汇总
+        List<SaleAndClientRequireParam> saleAndClientRequireParams = geneateSaleAndClientRequireParam(param);
+        for(int i=0;i<saleAndClientRequireParams.size();i++){
+            SaleAndClientRequireParam temp_param = saleAndClientRequireParams.get(i);
+            ClientTableDTO clientTableDTO_temp = new ClientTableDTO();
+            clientTableDTO_temp.setTitle(temp_param.getDescTxt());
+            clientTableDTO_temp.setRes(getIndexTableList(temp_param));
+            //wb = getExcel_07(clientTableDTO_temp,wb);
+            wb = getExcel_07_no_shop(clientTableDTO_temp,wb);
+        }
 
         try {
             this.setResponseHeader(response, fileName);
@@ -1051,14 +1060,30 @@ public class SaleAndClientAction {
         }
     }
 
-    public SXSSFWorkbook getExcel_07(ClientTableDTO clientTableDTO,SXSSFWorkbook wb,String fileName){
-
-        List<IndexTable> saleAndClient = transfromToIndexList(clientTableDTO.getRes());
+    public SXSSFWorkbook getExcel_07(ClientTableDTO clientTableDTO,SXSSFWorkbook wb){
 
         if(wb == null){
             wb = new SXSSFWorkbook();
         }
-        ExcelUtil_SEVEN.createSaleAndClient(wb,clientTableDTO.getTitle());
+        //标题
+        ExcelUtil_SEVEN.createSaleAndClient_title(wb,clientTableDTO.getTitle());
+
+        //内容
+        ExcelUtil_SEVEN.createSaleAndClient_body(wb,clientTableDTO);
+
+        return wb;
+    }
+
+    public SXSSFWorkbook getExcel_07_no_shop(ClientTableDTO clientTableDTO,SXSSFWorkbook wb){
+
+        if(wb == null){
+            wb = new SXSSFWorkbook();
+        }
+        //标题
+        ExcelUtil_SEVEN.createSaleAndClient_title_NO_shop(wb,clientTableDTO.getTitle());
+
+        //内容
+        ExcelUtil_SEVEN.createSaleAndClient_body_no_shop(wb,clientTableDTO);
 
         return wb;
     }
