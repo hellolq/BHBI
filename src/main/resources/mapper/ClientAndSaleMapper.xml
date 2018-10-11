@@ -114,10 +114,10 @@
             a.hyxszb as hyxszb, a.dcRate,
             TO_CHAR(ROUND(decode(b.xsjedb,0,0,(a.xsje-b.xsjedb)/b.xsjedb *100 ),2) , 'fm9999990.0999')|| '%' as xsjeTb,
             TO_CHAR(ROUND(decode(b.xsbsdb,0,0,(a.xsbs-b.xsbsdb)/b.xsbsdb *100 ),2) , 'fm9999990.0999')|| '%' as xsbsTb,
-            TO_CHAR(ROUND(decode(b.kll,0,0,(a.kll-b.kll)/b.kll *100 ),2) , 'fm9999990.0999')|| '%' as kllTb,
+            TO_CHAR(ROUND(decode(klldb.kll,0,0,(a.kll-klldb.kll)/klldb.kll *100 ),2) , 'fm9999990.0999')|| '%' as kllTb,
                 c.xsjedb as xsjeQn,
                 c.xsbsdb as xsbsQn,
-                c.kll as kllQn,
+                kllqn.kll as kllQn,
                 c.hyxs as hyxsQn,
 
                 c.hyxszb as hyxszbQn,
@@ -129,7 +129,7 @@
             round((nvl(sum(c.xsje),0)+nvl(sum(d.xsje),0)+nvl(sum(e.xsje),0)+ nvl(sum(f.xsje),0))/10000,2) as gmv,
             sum(a.hyxs) as hyxs,
             TO_CHAR(ROUND(decode(sum(a.xsje),0,0,sum(a.xsml)/ sum(a.xsje) *100 ),2) , 'fm9999990.0999')|| '%'  as mll,
-            sum(a.kll) as kll,sum(a.xsbs) as xsbs,
+            sum(kll.kll) as kll,sum(a.xsbs) as xsbs,
             TO_CHAR(ROUND(decode(sum(a.xsje),0,0,sum(a.hyxs)/ sum(a.xsje) *100 ),2) , 'fm9999990.0999')|| '%'  as hyxszb,
             ROUND(decode(sum(a.xsje),0,0,sum(a.hyxs)/ sum(a.xsje) *100 ),2) as hyxsData
 
@@ -156,6 +156,13 @@
             LEFT JOIN ( select d.shopid,sum(a.amount) as xsje,a.rq  from INPUTSALE a,shopdef b,malldef c,lp_bi_shop d
             where a.shopid = b.id and b.mallid = c.id and c.code = d.ebs_mcid and status = 1
             group by d.shopid,a.rq  ) f ON f.shopid = a.shopid and a.rq = f.rq
+
+            left join (select shop.shopid,kl.mdate,sum(case kl.starthr when '09' then (kl.incount * 0.5) when '22'
+            then (kl.incount * 0.5) else kl.incount end) as kll from lp_bi_shop shop, kl_shop_hours kl where shop.kl_mcid = kl.shopid
+            and kl.areatypeid = 2 and kl.starthr >= 9 and kl.starthr <![CDATA[ <= ]]> 22
+             group by shop.shopid,kl.mdate) kll
+            ON a.shopid = kll.shopid and a.zfrq = kll.mdate
+
             WHERE 1=1
             <if test=" shopId != '' and shopId != null " >
                 and a.shopId in (${shopId})
@@ -164,15 +171,15 @@
             <if test=" startTime != '' and startTime != null " >
                 and a.rq between  to_date(#{startTime},'yyyymmdd') and to_date(#{endTime},'yyyymmdd')
             </if>
-            group by b.shopid ,b.shopname,b.bj_yt,b.sq)a  left join (
-            SELECT sum(xsje) as xsjedb,sum(xsbs) as xsbsdb,sum(kll) as kll,
+            group by b.shopid ,b.shopname,b.bj_yt,b.sq) a  left join (
+            SELECT sum(xsje) as xsjedb,sum(xsbs) as xsbsdb,
             sum(hyxs) as hyxs,
             ROUND(decode(sum(xsje),0,0,sum(xsml)/ sum(xsje) *100 ),2) as mllData,
             shopid FROM ZH_MD_TBZS where rq between to_date(#{startTimedb}, 'yyyymmdd')
             and to_date(#{endTimedb}, 'yyyymmdd') group by shopid
             ) b ON   a.shopid = b.shopid
 
-                left join (SELECT sum(xsje) as xsjedb,sum(xsbs) as xsbsdb,sum(kll) as kll,
+                left join (SELECT sum(xsje) as xsjedb,sum(xsbs) as xsbsdb,
                 sum(hyxs) as hyxs,
                 TO_CHAR(ROUND(decode(sum(xsje),0,0,sum(hyxs)/ sum(xsje) *100 ),2) , 'fm9999990.0999')|| '%'  as hyxszb,
                 TO_CHAR(ROUND(decode(sum(xsje),0,0,sum(xsml)/ sum(xsje) *100 ),2) , 'fm9999990.0999')|| '%'  as mll,
@@ -181,15 +188,29 @@
                 where rq between (to_date(#{startTime}, 'yyyymmdd')-365) and
                 (to_date(#{endTime}, 'yyyymmdd')-365)
                 group by shopid) c ON a.shopid = c.shopid
+
+            left join (select shop.shopid,kl.mdate,sum(case kl.starthr when '09' then (kl.incount * 0.5) when '22'
+            then (kl.incount * 0.5) else kl.incount end) as kll from lp_bi_shop shop, kl_shop_hours kl where shop.kl_mcid = kl.shopid
+            and kl.areatypeid = 2 and kl.starthr >= 9 and kl.starthr <![CDATA[ <= ]]> 22  and mdate >=
+            to_char(to_date(#{startTime}, 'yyyymmdd')-365,'yyyymmdd')
+            and mdate <![CDATA[ <= ]]> to_char(to_date(#{endTime}, 'yyyymmdd')-365,'yyyymmdd') group by shop.shopid,kl.mdate) kllqn
+            ON a.shopid = kllqn.shopid
+
+            left join (select shop.shopid,kl.mdate,sum(case kl.starthr when '09' then (kl.incount * 0.5) when '22'
+            then (kl.incount * 0.5) else kl.incount end) as kll from lp_bi_shop shop, kl_shop_hours kl where shop.kl_mcid = kl.shopid
+            and kl.areatypeid = 2 and kl.starthr >= 9 and kl.starthr <![CDATA[ <= ]]> 22  and mdate >=
+            to_char(to_date(#{startTimedb}, 'yyyymmdd')-365,'yyyymmdd')
+            and mdate <![CDATA[ <= ]]> to_char(to_date(#{endTimedb}, 'yyyymmdd')-365,'yyyymmdd') group by shop.shopid,kl.mdate) klldb
+            ON a.shopid = klldb.shopid
         </if>
 
-
+<!-- start -->
         <if test=' dbType == "0" ' >
         SELECT b.shopid as shopId,b.shopname as shopName,b.bj_yt as yt,b.sq as sq,sum(a.xsje) as xsje,
         round((nvl(sum(c.xsje),0)+nvl(sum(d.xsje),0)+nvl(sum(e.xsje),0)+ nvl(sum(f.xsje),0))/10000,2) as gmv,
         sum(a.hyxs) as hyxs,
             TO_CHAR(ROUND(decode(sum(a.xsje),0,0,sum(a.hyxs)/ sum(a.xsje) *100 ),2) , 'fm9999990.0999')|| '%'  as hyxszb,
-            sum(a.kll) as kll,sum(a.xsbs) as xsbs,
+            sum(kll.kll) as kll,sum(a.xsbs) as xsbs,
             to_char(a.rq,'${timeType}') as zfrq ,
             TO_CHAR(ROUND(decode(sum(a.xsje_kb),0,0,(sum(a.xsje)-sum(a.xsje_kb))/ sum(a.xsje_kb) *100 ),2), 'fm9999990.0999') || '%'  as xsjekbRate ,
         TO_CHAR(ROUND(decode(sum(a.xsje),0,0,sum(a.xsml)/ sum(a.xsje) *100 ),2) , 'fm9999990.0999')|| '%'  as mll
@@ -215,6 +236,12 @@
         LEFT JOIN ( select d.shopid,sum(a.amount) as xsje,a.rq  from INPUTSALE a,shopdef b,malldef c,lp_bi_shop d
         where a.shopid = b.id and b.mallid = c.id and c.code = d.ebs_mcid and status = 1
         group by d.shopid,a.rq  ) f ON f.shopid = a.shopid and a.rq = f.rq
+
+        LEFT JOIN ( select shop.shopid,kl.mdate,sum(case kl.starthr when '09' then (kl.incount * 0.5) when '22' then (kl.incount * 0.5)
+        else kl.incount end) as kll from lp_bi_shop shop, kl_shop_hours kl where shop.kl_mcid = kl.shopid and kl.areatypeid = 2
+        and kl.starthr >= 9 and kl.starthr <![CDATA[ <= ]]> 22
+        group by shop.shopid,kl.mdate ) kll ON kll.shopid = a.shopid and a.zfrq = kll.mdate
+
         WHERE 1=1
         <if test=" shopId != '' and shopId != null " >
             and a.shopId in (${shopId})

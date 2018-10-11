@@ -5,12 +5,26 @@
     <select id="selectFloorKll"  resultType="com.bbg.pojo.FloorKllDTO" parameterType="com.bbg.pojo.FloorClientParam">
         select  a.shopId ,a.shopname as shopName,a.areaname as floorName,a.doorname as doorName,a.doorid as doorId,
         nvl(a.incount,0) as incount,nvl(b.incount,0) as incountCom from
-        (select b.shopId,b.shopname,a.areaname,a.doorname,a.doorid,nvl(sum(a.incount),0) as incount from KL_floor_counter_HOURS a,lp_bi_shop b
-        WHERE b.shopid IN (${shopId})  and a.mdate >=  #{startTime} and <![CDATA[ a.mdate <= #{endTime} ]]>  and a.areatypeid = 7  and   a.shopid = b.kl_mcid
+        (select b.shopId,b.shopname,a.areaname,a.doorname,a.doorid,nvl(sum(case a.starthr
+        when '09' then (a.incount * 0.5)
+        when '22' then (a.incount * 0.5)
+        else a.incount
+        end),0) as incount from KL_floor_counter_HOURS a,lp_bi_shop b
+        WHERE b.shopid IN (${shopId})  and a.mdate >=  #{startTime} and <![CDATA[ a.mdate <= #{endTime} ]]>
+        and a.areatypeid = 7  and   a.shopid = b.kl_mcid
+        AND a.starthr <![CDATA[ >= ]]>  '09'
+        AND a.starthr <![CDATA[ <= ]]> '22'
         group by   b.shopId,b.shopname,a.areaname,a.doorname,a.doorid) a
         LEFT JOIN
-        (select  b.shopId,b.shopname,a.areaname,a.doorname,a.doorid,nvl(sum(a.incount),0) as incount from KL_floor_counter_HOURS a,lp_bi_shop b
-        WHERE b.shopid IN (${shopId})  and mdate >= #{startTimeCom} and <![CDATA[ a.mdate <= #{endTimeCom} ]]>  and a.areatypeid = 7  and   a.shopid = b.kl_mcid
+        (select  b.shopId,b.shopname,a.areaname,a.doorname,a.doorid,nvl(sum(case a.starthr
+        when '09' then (a.incount * 0.5)
+        when '22' then (a.incount * 0.5)
+        else a.incount
+        end),0) as incount from KL_floor_counter_HOURS a,lp_bi_shop b
+        WHERE b.shopid IN (${shopId}) <![CDATA[ and mdate >= #{startTimeCom} ]]>   and <![CDATA[ a.mdate <= #{endTimeCom} ]]>
+        and a.areatypeid = 7  and   a.shopid = b.kl_mcid
+        AND a.starthr <![CDATA[ >= ]]>  '09'
+        AND a.starthr <![CDATA[ <= ]]> '22'
         group by   b.shopId,b.shopname,a.areaname,a.doorname,a.doorid) b  ON a.shopId = b.shopId and a.doorid = b.doorid
         order by a.shopId,a.areaname,a.doorid
     </select>
