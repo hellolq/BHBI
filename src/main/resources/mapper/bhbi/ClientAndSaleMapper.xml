@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.bbg.mapper.ClientAndSaleMapper">
+<mapper namespace="com.bbg.mapper.bhbi.ClientAndSaleMapper">
 
     <select id="selectIndexTable"  resultType="com.bbg.pojo.IndexTable" parameterType="com.bbg.pojo.SaleAndClientRequireParam">
        select lp.shopId as shopId,lp.pc_shopname as shopName,lp.bj_yt as shopYt,decode(nvl(b.xsje,0),0,0,1) as kbType, a.xsje,b.xsje as xsjeTq ,

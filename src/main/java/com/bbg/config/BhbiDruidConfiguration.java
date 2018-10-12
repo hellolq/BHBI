@@ -3,12 +3,20 @@ package com.bbg.config;
 import com.alibaba.druid.pool.DruidDataSource;
 import com.alibaba.druid.support.http.StatViewServlet;
 import com.alibaba.druid.support.http.WebStatFilter;
+import org.apache.ibatis.session.SqlSessionFactory;
+import org.mybatis.spring.SqlSessionFactoryBean;
+import org.mybatis.spring.SqlSessionTemplate;
+import org.mybatis.spring.annotation.MapperScan;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.boot.web.servlet.ServletRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.PropertySource;
+import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
+import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 
 import javax.sql.DataSource;
 
@@ -17,13 +25,36 @@ import javax.sql.DataSource;
  */
 @Configuration
 @PropertySource(value = "classpath:application.properties")
-public class DruidConfiguration {
+@MapperScan(basePackages = "com.bbg.mapper.bhbi", sqlSessionTemplateRef = "bhbiSqlSessionTemplate")
+public class BhbiDruidConfiguration {
 
-    @Bean(destroyMethod = "close", initMethod = "init")
-    @ConfigurationProperties(prefix = "spring.datasource")
-    public DataSource druidDataSource() {
+    @Bean(name = "bhbiDataSource")
+    @ConfigurationProperties(prefix = "spring.datasource.bhbi")
+    @Primary
+    public DataSource bhbiDataSource() {
         DruidDataSource druidDataSource = new DruidDataSource();
         return druidDataSource;
+    }
+
+    @Bean(name = "bhbiTransactionManager")
+    @Primary
+    public DataSourceTransactionManager setTransactionManager(@Qualifier("bhbiDataSource") DataSource dataSource) {
+        return new DataSourceTransactionManager(dataSource);
+    }
+
+    @Bean(name = "bhbiSqlSessionFactory")
+    @Primary
+    public SqlSessionFactory setSqlSessionFactory(@Qualifier("bhbiDataSource") DataSource dataSource) throws Exception {
+        SqlSessionFactoryBean bean = new SqlSessionFactoryBean();
+        bean.setDataSource(dataSource);
+        bean.setMapperLocations(new PathMatchingResourcePatternResolver().getResources("classpath:mapper/bhbi/*.xml"));
+        return bean.getObject();
+    }
+
+    @Bean(name = "bhbiSqlSessionTemplate")
+    @Primary
+    public SqlSessionTemplate setSqlSessionTemplate(@Qualifier("bhbiSqlSessionFactory") SqlSessionFactory sqlSessionFactory) throws Exception {
+        return new SqlSessionTemplate(sqlSessionFactory);
     }
 
     /**
