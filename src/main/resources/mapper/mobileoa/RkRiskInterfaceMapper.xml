@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bbg.mapper.mobileoa.RkRiskInterfaceMapper">
+
+    <sql id="rkColumns"> ${rk}.RK_MSG_ID,${rk}.LEVEL_ID,${rk}.CONTENT </sql>
+
+    <resultMap id="rkResultMap" type="com.bbg.pojo.RK_RISK_INTERFACE" >
+        <id property="rk_msg_id" column="RK_MSG_ID" />
+        <result property="level_id" column="LEVEL_ID"/>
+        <result property="content" column="CONTENT"/>
+    </resultMap>
+
+    <select id="selectAll"  resultMap="rkResultMap">
+       select
+          RK_MSG_ID as rk_msg_id
+       from RK_RISK_INTERFACE
+    </select>
+
+
+
+</mapper>
