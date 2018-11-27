@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bbg.mapper.bhbi.BhSaleDcMapper">
+
+    <sql id="wx_send_message_sql">
+        message_id	,message_type,message_content,
+        receive_empid,admin_empid,send_status,send_message,message_content_admin,
+        note,time_one,time_two,time_three,to_char(last_update,'yyyymmdd') as last_update
+    </sql>
+
+    <sql id="xsdc_jk_sql">
+       jk_id,jk_val,jk_type,jk_xsje,jk_xsjh,jk_dc,to_char(last_update,'yyyymmdd') as last_update,jk_zq,jk_flag
+    </sql>
+
+    <sql id="shop_sql">
+        shopid,shopname
+    </sql>
+
+    <resultMap id="shop_map" type="com.bbg.pojo.DataDealDTO">
+        <id property="shop_id" column="shopid"></id>
+        <result property="shop_name" column="shopname"></result>
+
+    </resultMap>
+
+    <resultMap id="wx_send_message_map" type="com.bbg.pojo.DataDealDTO">
+        <id property="message_id" column="message_id"></id>
+        <result property="message_type" column="message_type"></result>
+        <result property="message_content" column="message_content"></result>
+        <result property="receive_empid" column="receive_empid"></result>
+        <result property="admin_empid" column="admin_empid"></result>
+        <result property="send_status" column="send_status"></result>
+        <result property="send_message" column="send_message"></result>
+        <result property="note" column="note"></result>
+        <result property="time_one" column="time_one"></result>
+        <result property="time_two" column="time_two"></result>
+        <result property="time_three" column="time_three"></result>
+        <result property="last_update" column="last_update"></result>
+        <result property="message_content_admin" column="message_content_admin"></result>
+    </resultMap>
+
+    <resultMap id="xsdc_jk_map" type="com.bbg.pojo.DataDealDTO">
+        <id property="jk_id" column="jk_id"></id>
+        <result property="jk_val" column="jk_val"></result>
+        <result property="jk_type" column="jk_type"></result>
+        <result property="jk_xsje" column="jk_xsje"></result>
+        <result property="jk_xsjh" column="jk_xsjh"></result>
+        <result property="jk_dc" column="jk_dc"></result>
+        <result property="last_update" column="last_update"></result>
+        <result property="jk_zq" column="jk_zq"></result>
+        <result property="jk_flag" column="jk_flag"></result>
+    </resultMap>
+
+    <select id="getDcNum" resultType="Integer">
+
+        SELECT count(*) as num
+         FROM xsdc_jk where jk_type = #{jkType} and jk_dc > 1
+
+    </select>
+
+    <select id="getShopByShopId" resultMap="shop_map">
+
+        SELECT
+        <include refid="shop_sql" ></include>
+        FROM lp_bi_shop
+        WHERE 1=1
+        and shopid = #{shopId}
+
+    </select>
+
+    <select id="getXsdcJkOne" resultMap="xsdc_jk_map">
+       SELECT
+        <include refid="xsdc_jk_sql" ></include>
+       FROM xsdc_jk
+        WHERE 1=1
+          AND  jk_dc <![CDATA[ > ]]> 1
+          and jk_flag = 0
+
+
+    </select>
+
+  <select id="getWxSendMessage" resultMap="wx_send_message_map">
+      select
+         <include refid="wx_send_message_sql" ></include>
+      from wx_send_message
+      where
+      1 = 1
+      <if test=" message_id != '' and message_id != null " >
+          AND  message_id  = #{message_id}
+      </if>
+
+      <if test=" send_status != '' and send_status != null " >
+          AND  send_status  = #{send_status}
+      </if>
+
+  </select>
+    
+    <update id="updateWxSendMessage" >
+        UPDATE wx_send_message SET last_update = SYSDATE
+        <if test=" send_status != '' and send_status != null " >
+            ,  send_status  = #{send_status}
+        </if>
+        <if test=" send_message != '' and send_message != null " >
+            ,  send_message  = #{send_message,jdbcType=CLOB}
+        </if>
+        WHERE message_id = #{message_id}
+    </update>
+
+  <!-- <insert id="insertIntoMessagePush" >
+
+        INSERT INTO wx_send_message(message_id,message_type,message_content,receive_empid,admin_empid,send_status,
+        send_message,note,time_one,time_two,time_three,last_update,message_content_admin) VALUES (#(message_id),
+        '','','','','','','',
+        '','','',SYSDATE,'')
+
+    </insert>-->
+
+   <insert id="insertIntoMessagePush" >
+
+        INSERT INTO wx_send_message(message_id,message_type,message_content,receive_empid,admin_empid,send_status,
+        send_message,note,time_one,time_two,time_three,last_update,message_content_admin) VALUES (#{message_id},
+        #{message_type},#{message_content},#{receive_empid},#{admin_empid},'0','','',
+        #{time_one},'','',SYSDATE,#{message_content_admin})
+
+    </insert>
+
+
+    <update id="updateXsdc_jkById" >
+       update xsdc_jk set jk_flag = 1 where jk_id = #{id}
+    </update>
+
+</mapper>

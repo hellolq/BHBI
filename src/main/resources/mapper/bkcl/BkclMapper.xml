@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bbg.mapper.bkcl.BkclMapper">
+
+
+
+
+    <select id="selectApp_dhd" resultType="Integer">
+
+        select count(*) from app_dhd
+
+    </select>
+
+
+    <insert id="insertIntoAPP_DHD" >
+        INSERT INTO
+        app_dhd_test(traceid,shopid,dhd,dhrq,status,clbj)
+        VALUES (#{traceId},#{shopId},#{dhd},sysdate,'0','0')
+    </insert>
+
+    <insert id="insertIntoAPP_DHDITEM" >
+        INSERT INTO
+        app_dhditem_test(dhd,goodsid,dhsl,dhje)
+        VALUES
+        <foreach collection="list" item="source" index="index" separator=",">
+            (#{source.dhd,jdbcType=VARCHAR},#{source.goodsId,jdbcType=VARCHAR},
+            #{source.dhsl,jdbcType=NUMERIC},#{source.dhje,jdbcType=NUMERIC})
+        </foreach>
+
+    </insert>
+
+
+
+</mapper>
