@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.bbg.mapper.bhbi.ClientAndSaleMapper">
+<mapper namespace="com.bbg.mapper.znpos.ClientAndSaleMapper">
 
     <select id="selectIndexTable"  resultType="com.bbg.pojo.IndexTable" parameterType="com.bbg.pojo.SaleAndClientRequireParam">
        select lp.shopId as shopId,lp.pc_shopname as shopName,lp.bj_yt as shopYt,decode(nvl(b.xsje,0),0,0,1) as kbType, a.xsje,b.xsje as xsjeTq ,
@@ -277,7 +277,7 @@
   </select>
 
     <select id="selectAllShop" resultType="com.bbg.pojo.ShopInfo">
-        select shopid as shopId,shopname as shopName,sq,bj_yt as bjYt from lp_bi_shop WHERE shopId != '012837'
+        select shopid as shopId,shopname as shopName,sq,bj_yt as bjYt from lp_bi_shop WHERE shopId != '012837' and  bj_bd = '0'
     </select>
 
 </mapper>

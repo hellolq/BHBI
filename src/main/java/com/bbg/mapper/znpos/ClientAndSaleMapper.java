@@ -1,4 +1,4 @@
-package com.bbg.mapper.bhbi;
+package com.bbg.mapper.znpos;
 
 import com.bbg.pojo.IndexTable;
 import com.bbg.pojo.SaleAndClient;

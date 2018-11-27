@@ -16,6 +16,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 
 import javax.sql.DataSource;
@@ -55,6 +56,11 @@ public class BhbiDruidConfiguration {
     @Primary
     public SqlSessionTemplate setSqlSessionTemplate(@Qualifier("bhbiSqlSessionFactory") SqlSessionFactory sqlSessionFactory) throws Exception {
         return new SqlSessionTemplate(sqlSessionFactory);
+    }
+
+    @Bean(name="bhbiJdbcTemplate")
+    public JdbcTemplate bhbiJdbcTemplate(@Qualifier("bhbiDataSource") DataSource dataSource){
+        return new JdbcTemplate(dataSource);
     }
 
     /**

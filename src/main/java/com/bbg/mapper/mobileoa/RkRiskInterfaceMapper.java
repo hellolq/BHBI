@@ -15,4 +15,6 @@ public interface RkRiskInterfaceMapper {
 
     List<RK_RISK_INTERFACE> selectAll();
 
+    //List<BbgBhExceptionThree> getBbgBhExceptionThreeList(String time,String shopId)
+
 }
