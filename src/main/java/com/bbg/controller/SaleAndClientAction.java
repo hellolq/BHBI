@@ -78,14 +78,14 @@ public class SaleAndClientAction {
 
     @RequestMapping("/selectSaleAndClientEchart")
     public String selectSaleAndClientEchart(ModelMap map,IndexWithConditionDTO param){
-       if(param.getBtns() != null){
-           map.addAttribute("preParam",param);
-       }else{
-           //获取省区列表
-           List<String> sqList = clientAndSaleMapper.selectSqList();
-           map.addAttribute("sqList",sqList);
+        if(param.getBtns() != null){
+            map.addAttribute("preParam",param);
+        }else{
+            //获取省区列表
+            List<String> sqList = clientAndSaleMapper.selectSqList();
+            map.addAttribute("sqList",sqList);
 
-       }
+        }
         //获取所有门店
         List<ShopInfo> shops = clientAndSaleMapper.selectAllShop();
         map.addAttribute("page_shops",shops);
@@ -282,7 +282,7 @@ public class SaleAndClientAction {
             indexTable_shops_sh_kb.setShopName("生活可比店");
             saleAndClient.add(indexTable_shops_sh_kb);
         }
-          //shops_sh 生活广场业态合计
+        //shops_sh 生活广场业态合计
         if(!StringUtils.isEmpty(shops_sh)) {
             param.setShopId(shops_sh.substring(1));
             IndexTable indexTable_shops_sh = clientAndSaleMapper.selectIndexTableByShopId(param);
@@ -573,12 +573,13 @@ public class SaleAndClientAction {
             SaleAndClientRequireParam temp_param = saleAndClientRequireParams.get(i);
             ClientTableDTO clientTableDTO_temp = new ClientTableDTO();
             clientTableDTO_temp.setTitle(temp_param.getDescTxt());
-            if(i > 0){
-                clientTableDTO_temp.setRes(getIndexTableList(temp_param,index_sort));
+            clientTableDTO_temp.setRes(getIndexTableList(temp_param,clientTableDTO.getRes()));
+            /*if(i > 0){
+
             }else{
                 clientTableDTO_temp.setRes(getIndexTableList(temp_param));
                 index_sort = clientTableDTO_temp.getRes();
-            }
+            }*/
 
             res.add(clientTableDTO_temp);
         }
@@ -736,14 +737,14 @@ public class SaleAndClientAction {
         }
 
         try {
-             this.setResponseHeader(response, fileName);
-             OutputStream os = response.getOutputStream();
-      wb.write(os);
-       os.flush();
-       os.close();
-} catch (Exception e) {
-       e.printStackTrace();
- }
+            this.setResponseHeader(response, fileName);
+            OutputStream os = response.getOutputStream();
+            wb.write(os);
+            os.flush();
+            os.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public static List<IndexTable> transfromToIndexList(List<IndexTable> saleAndClient){
@@ -956,12 +957,13 @@ public class SaleAndClientAction {
             SaleAndClientRequireParam temp_param = saleAndClientRequireParams.get(i);
             ClientTableDTO clientTableDTO_temp = new ClientTableDTO();
             clientTableDTO_temp.setTitle(temp_param.getDescTxt());
-            if(i > 0){
-                clientTableDTO_temp.setRes(getIndexTableList(temp_param,index_sort));
+            clientTableDTO_temp.setRes(getIndexTableList(temp_param,clientTableDTO.getRes()));
+            /*if(i > 0){
+
             }else{
                 clientTableDTO_temp.setRes(getIndexTableList(temp_param));
                 index_sort = clientTableDTO_temp.getRes();
-            }
+            }*/
             res.add(clientTableDTO_temp);
         }
         HSSFWorkbook wb = null;
@@ -1039,7 +1041,9 @@ public class SaleAndClientAction {
             SaleAndClientRequireParam temp_param = saleAndClientRequireParams.get(i);
             ClientTableDTO clientTableDTO_temp = new ClientTableDTO();
             clientTableDTO_temp.setTitle(temp_param.getDescTxt());
-            clientTableDTO_temp.setRes(getIndexTableList(temp_param));
+            //clientTableDTO_temp.setRes(getIndexTableList(temp_param));
+            clientTableDTO_temp.setRes(getIndexTableList(temp_param,clientTableDTO.getRes()));
+
             //wb = getExcel_07(clientTableDTO_temp,wb);
             wb = getExcel_07_no_shop(clientTableDTO_temp,wb);
         }

@@ -18,7 +18,7 @@
         VALUES (#{traceId},#{shopId},#{dhd},sysdate,'0','0')
     </insert>
 
-    <insert id="insertIntoAPP_DHDITEM" >
+    <!--<insert id="insertIntoAPP_DHDITEM" parameterType="java.util.List" useGeneratedKeys="false" >
         INSERT INTO
         app_dhditem_test(dhd,goodsid,dhsl,dhje)
         VALUES
@@ -27,6 +27,22 @@
             #{source.dhsl,jdbcType=NUMERIC},#{source.dhje,jdbcType=NUMERIC})
         </foreach>
 
+    </insert>-->
+
+
+    <insert id="insertIntoAPP_DHDITEM" parameterType="java.util.List" useGeneratedKeys="false" >
+        INSERT INTO app_dhditem_test
+        (
+        dhd,goodsid,dhsl,dhje
+        )
+        <foreach item="source" index="index" collection="list" separator="union all">
+            (
+            SELECT
+            #{source.dhd,jdbcType=VARCHAR},#{source.goodsId,jdbcType=VARCHAR},
+            #{source.dhsl,jdbcType=NUMERIC},#{source.dhje,jdbcType=NUMERIC}
+            FROM DUAL
+            )
+        </foreach>
     </insert>
 
 

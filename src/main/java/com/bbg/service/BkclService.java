@@ -4,6 +4,8 @@ import com.bbg.mapper.bkcl.BkclMapper;
 import com.bbg.pojo.BfclDTO;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,6 +23,9 @@ public class BkclService {
     @Autowired
     private BkclMapper bkclMapper;
 
+    private final static Logger logger = (Logger) LoggerFactory.getLogger(BkclService.class);
+
+
     @Transactional(value = "bkclTransactionManager",rollbackFor=Exception.class)
     public void insertIntoTable(BfclDTO source){
         bkclMapper.insertIntoAPP_DHD(source);
@@ -29,6 +34,7 @@ public class BkclService {
     }
 
     public BfclDTO parsonDsJson(String source) throws IOException {
+
         BfclDTO model = new BfclDTO();
         ObjectMapper mapper = new ObjectMapper();
         JsonNode rootNode = mapper.readTree(source);

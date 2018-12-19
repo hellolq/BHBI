@@ -47,4 +47,15 @@ public interface BhSaleDcMapper {
     * */
     public int updateXsdc_jkById(@Param("id")String id);
 
+    /*
+    * 根据门店ID 查询 接收信息的工号 多个工号使用| 分隔
+    * */
+    public String selectEmpIdByShopId(@Param("shopId") String shopId);
+
+    /*
+    * 调用存储过程
+    * 检查门店达成情况
+    * */
+    public void call_dc_month_check();
+
 }

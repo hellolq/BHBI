@@ -105,14 +105,6 @@
         WHERE message_id = #{message_id}
     </update>
 
-  <!-- <insert id="insertIntoMessagePush" >
-
-        INSERT INTO wx_send_message(message_id,message_type,message_content,receive_empid,admin_empid,send_status,
-        send_message,note,time_one,time_two,time_three,last_update,message_content_admin) VALUES (#(message_id),
-        '','','','','','','',
-        '','','',SYSDATE,'')
-
-    </insert>-->
 
    <insert id="insertIntoMessagePush" >
 
@@ -127,5 +119,20 @@
     <update id="updateXsdc_jkById" >
        update xsdc_jk set jk_flag = 1 where jk_id = #{id}
     </update>
+
+    <select id="selectEmpIdByShopId" resultType="String">
+        select listagg(auth_Empcode,'|') WITHIN GROUP (order by auth_Empcode) as authEmpcode from
+         (SELECT auth.auth_empcode  FROM Ra_Ydjx_Partauth_Bh_Bhbi auth WHERE auth.auth_roletype = 'ZBLD'
+         AND  instr(type,'6') > 0
+         AND  ( (auth.auth_province is null) or (instr(auth_Province,（select sq from lp_bi_shop where shopId = #{shopId}）) > 0) )
+         union
+        select md.auth_empcode  from Ra_Ydjx_Partauth_Bh_Bhbi md where md.auth_roletype = 'MDDZ'
+          AND  instr(type,'6') > 0
+         and instr(md.auth_Shopids,#{shopId}) > 0)
+    </select>
+
+    <select id="call_dc_month_check" statementType="CALLABLE">
+       call dc_month_check()
+    </select>
 
 </mapper>
