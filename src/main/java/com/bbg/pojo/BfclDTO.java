@@ -17,6 +17,7 @@ public class BfclDTO {
     private String goodName;//商品名称
     private int dhsl;//订货数量
     private double dhje;//订货金额
+    private double yhje;//优惠金额
 
     private String shopId;//门店id
     private String dhrq;//订货日期
@@ -165,15 +166,28 @@ public class BfclDTO {
     public void setStoreCode(String storeCode) {
         this.storeCode = storeCode;
     }
+
+    public double getYhje() {
+        return yhje;
+    }
+
+    public void setYhje(double yhje) {
+        this.yhje = yhje;
+    }
+
     @Override
     public String toString() {
         return "BfclDTO{" +
-                "traceId='" + traceId + '\'' +
+                "data='" + data + '\'' +
+                ", member='" + member + '\'' +
+                ", storeCode='" + storeCode + '\'' +
+                ", traceId='" + traceId + '\'' +
                 ", dhd='" + dhd + '\'' +
                 ", goodsId='" + goodsId + '\'' +
                 ", goodName='" + goodName + '\'' +
                 ", dhsl=" + dhsl +
                 ", dhje=" + dhje +
+                ", yhje=" + yhje +
                 ", shopId='" + shopId + '\'' +
                 ", dhrq='" + dhrq + '\'' +
                 ", status='" + status + '\'' +

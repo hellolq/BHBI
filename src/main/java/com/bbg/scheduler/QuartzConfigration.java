@@ -59,7 +59,7 @@ public class QuartzConfigration {
     public CronTriggerFactoryBean cronJobTrigger_sendMessage(JobDetail  jobDetail_sendMessage) {
         CronTriggerFactoryBean tigger = new CronTriggerFactoryBean();
         tigger.setJobDetail(jobDetail_sendMessage);
-        tigger.setCronExpression("0 0/5 10,11,12,13,14,15,16,17,18,19,20,21,22,23 * * ?");// 初始时的cron表达式
+        tigger.setCronExpression("0 0/1 10,11,12,13,14,15,16,17,18,19,20,21,22,23 * * ?");// 初始时的cron表达式
         tigger.setName("sendMessage_tigger");// trigger的name
         return tigger;
 
@@ -75,6 +75,8 @@ public class QuartzConfigration {
         bean.setOverwriteExistingJobs(true);  
         bean.setStartupDelay(20);  
         bean.setTriggers(jobTrigger,jobTrigger_sendMessage);
+        //bean.setTriggers(jobTrigger);
+        //bean.setTriggers(jobTrigger_sendMessage);
         return bean;  
     }  
  

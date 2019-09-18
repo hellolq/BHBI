@@ -35,8 +35,8 @@ public class BhbiScheduler {
 	public void ckeck_message(){
 		try{
 
-			//bhSaleDcService.execute_find_message();
-			logger.info("执行execute_find_message,没5分钟执行一次");
+			bhSaleDcService.execute_find_message();
+			logger.info("执行execute_find_message,每1分钟执行一次");
 
 		}catch(Exception e){
 			logger.error("ckeck_dc_message :{}",e);

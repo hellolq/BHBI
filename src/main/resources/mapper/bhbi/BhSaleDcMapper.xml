@@ -132,7 +132,7 @@
     </select>
 
     <select id="call_dc_month_check" statementType="CALLABLE">
-       call dc_month_check()
+       call bhbi_monitor_task_pro()
     </select>
 
 </mapper>

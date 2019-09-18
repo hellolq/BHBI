@@ -25,10 +25,11 @@ public class BhSaleDcService {
     private BhSaleDcMapper bhSaleDcMapper;
 
     public void execute_find_message(){
-       pushDcMessageToWx_send_message();
-       sendMessageToAdmin();
-       sendMessageToEmp();
-       bhSaleDcMapper.call_dc_month_check();
+       //pushDcMessageToWx_send_message();
+        bhSaleDcMapper.call_dc_month_check();
+        sendMessageToAdmin();
+       //sendMessageToEmp();
+
     }
 
     public void pushDcMessageToWx_send_message(){

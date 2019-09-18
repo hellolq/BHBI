@@ -47,6 +47,22 @@ public class BkclService {
         String dhd = data.path("orderId").asText();
         model.setDhd(dhd);
 
+        // 提取优惠信息
+        JsonNode orderPmt = data.path("orderPmt");
+        List<BfclDTO> orderPmtList = new ArrayList<>();
+        if(orderPmt != null && orderPmt.size() > 0){
+            for(int i=0;i<orderPmt.size();i++){
+                BfclDTO temp_model = new BfclDTO();
+                JsonNode temp = orderPmt.get(i);
+                //  优惠总金额  pmtuomamt  pmtamt
+                double yhje = temp.path("pmtuomamt").asDouble();
+                String wareCode = temp.path("wareCode").asText();
+                temp_model.setYhje(yhje);
+                temp_model.setGoodsId(wareCode);
+                orderPmtList.add(temp_model);
+            }
+        }
+
         JsonNode wares = data.path("wares");
         List<BfclDTO> orders = new ArrayList<>();
         for(int i=0;i<wares.size();i++){
@@ -62,6 +78,19 @@ public class BkclService {
             orders.add(temp_model);
 
         }
+
+        if(orderPmtList != null && orderPmtList.size() > 0){
+            for(int i=0;i<orderPmtList.size();i++){
+                BfclDTO yh_temp = orderPmtList.get(i);
+                for(int j=0;j<orders.size();j++){
+                    BfclDTO or_temp = orders.get(j);
+                    if(yh_temp.getGoodsId().equals(or_temp.getGoodsId())){
+                        or_temp.setYhje(yh_temp.getYhje());
+                    }
+                }
+            }
+        }
+
         model.setOrders(orders);
         return model;
     }

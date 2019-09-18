@@ -33,13 +33,14 @@
     <insert id="insertIntoAPP_DHDITEM" parameterType="java.util.List" useGeneratedKeys="false" >
         INSERT INTO app_dhditem_test
         (
-        dhd,goodsid,dhsl,dhje
+        dhd,goodsid,dhsl,dhje,yhje
         )
         <foreach item="source" index="index" collection="list" separator="union all">
             (
             SELECT
             #{source.dhd,jdbcType=VARCHAR},#{source.goodsId,jdbcType=VARCHAR},
-            #{source.dhsl,jdbcType=NUMERIC},#{source.dhje,jdbcType=NUMERIC}
+            #{source.dhsl,jdbcType=NUMERIC},#{source.dhje,jdbcType=NUMERIC},
+            #{source.yhje,jdbcType=NUMERIC}
             FROM DUAL
             )
         </foreach>
